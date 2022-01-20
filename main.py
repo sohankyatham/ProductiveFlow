@@ -2,6 +2,7 @@
 # By: Sohan Kyatham
 
 
+
 # Imports
 from tkinter import *
 from tkinter import ttk
@@ -14,6 +15,7 @@ import tkinter.font as tkfont
 root = Tk()
 root.geometry("600x600")
 root.title("ProductiveFlow")
+root.resizable(False, False)
 
 
 # Global OpenFileName - used for finding name/status of opened file and using it later in code for functions such as saving a file and etc
@@ -47,11 +49,11 @@ def OpenFileFunc(*args):
         global OpenFileName
         OpenFileName = FilePath
     
-    TextBoxForNotes.delete("1.0", END)
 
     # Open File and Insert File Content into Editor
     FilePath = open(FilePath, 'r')
     FileContent = FilePath.read()
+    TextBoxForNotes.delete("1.0", END)
     TextBoxForNotes.insert(END, FileContent)
     FilePath.close()
 root.bind('<Control-Key-o>', OpenFileFunc)
@@ -107,6 +109,35 @@ def AboutScreenFunc():
     # Mainloop for AboutScreen
     AboutScreen.mainloop()
 
+
+
+'''
+Functions for To-Do List
+'''
+
+
+
+# To-Do List: Add Task Function
+def AddTaskFunc():
+    Task = EnterTaskEntry.get(1.0, END)
+    
+    # Add Task to ListBoxForTDList
+    ListBoxForTDList.insert(END, Task)
+    EnterTaskEntry.delete(1.0, END)
+
+
+# To-Do List: Delete Task Function
+def DeleteTaskFunc():
+    try:
+        TaskSelected = ListBoxForTDList.curselection()[0]
+        ListBoxForTDList.delete(TaskSelected)
+    except:
+        messagebox.showwarning(title="No Task Selected!", message="There was no task selected. Please select a task.")
+
+
+# To-Do List: Save Tasks Function
+def SaveTasksFunc():
+    file = 1
 
 
 '''
@@ -193,51 +224,63 @@ To-Do List Section
 
 
 # To-Do List Frame - A Frame to Place To-do List Program
-ToDoListFrame = Frame(TabControl, width="590", height="590")
+ToDoListFrame = Frame(TabControl, width="590", height="590", bg="lightgray")
 ToDoListFrame.pack(fill="both", expand=1)
 
 
 # TitleLabel - Displays a Title on the Screen called "To-Do List"
-TitleLabel = Label(ToDoListFrame, text="To-Do List", font=("Arial", 25, 'bold'))
+TitleLabel = Label(ToDoListFrame, text="To-Do List", font=("Arial", 36, 'bold'), bg="lightgray")
 TitleLabel.pack(side="top", fill=BOTH)
 
 
 '''Add Tasks Sections'''
 
-# AddTaskFrame - A Frame for Storing all the Widgets Regarding Add Tasks Functions
-AddTaskFrame = Frame(ToDoListFrame, width=250, height=500, bg="lightblue")
-AddTaskFrame.pack(side=LEFT, anchor=NE, pady=20)
+
+# ManageTaskFrame - A Frame for Storing all the Widgets Regarding Adding/Deleting Tasks Functions
+ManageTaskFrame = Frame(ToDoListFrame, width=250, height=500, bg="#26aceb")
+ManageTaskFrame.pack(side=LEFT, anchor=NE, pady=20)
 
 
-# EnterTaskLabel - Displays a Label on the Screen called "Enter Your Task"
-EnterTaskLabel = Label(AddTaskFrame, text="Enter Your Task:", font=("Arial", 18))
+# EnterTaskLabel - Displays a Label on the Screen called "Enter A Task"
+EnterTaskLabel = Label(ManageTaskFrame, text="Enter A Task:", width=14, font=("Arial", 20, 'bold'), bg="#26aceb", fg="Whitesmoke")
 EnterTaskLabel.pack()
 
 
-# EnterTaskEntry - Displays an Entry Widget Where User Can Enter Their Task
-EnterTaskEntry = Entry(AddTaskFrame, font=("Arial", 12))
-EnterTaskEntry.pack(pady=5)
+# EnterTaskEntry - Displays an Text Widget Where User Can Enter A Task
+EnterTaskEntry = Text(ManageTaskFrame, width=16, height=1, bd=2, font=("Arial", 14))
+EnterTaskEntry.pack(pady=10)
 
 
 # AddTaskButton - Displays a Button called "Add Task" Which Adds a Task into a list of Tasks 
-AddTaskButton = Button(AddTaskFrame, text="Add Task", font=("Arial", 12), command=None)
+AddTaskButton = Button(ManageTaskFrame, text="Add Task", font=("Arial", 12), command=AddTaskFunc)
 AddTaskButton.pack(pady=5)
+
+
+# DeleteTaskBtn - Displays a Button called "Delete Task" Which Deletes a Task in the ListBoxForTDList
+DeleteTaskBtn = Button(ManageTaskFrame, text="Delete Task", font=("Arial", 12), command=DeleteTaskFunc)
+DeleteTaskBtn.pack()
+
+
+# SaveTasksBtn - Displays a Button called "Save Tasks" Which Saves the Tasks to a File Which can be opened later
+SaveTasksBtn = Button(ManageTaskFrame, text="Save Tasks", font=("Arial", 12), command=SaveTasksFunc)
+SaveTasksBtn.pack()
 
 
 '''Tasks Section'''
 
+
 # TasksFrame - A Frame for Storing all the Widgets Regarding Task Functions
-TasksFrame = Frame(ToDoListFrame, width=350, height=500, bg="yellow")
-TasksFrame.pack(side=RIGHT, anchor=NW)
+TasksFrame = Frame(ToDoListFrame, width=350, height=500, bg="#5856D6")
+TasksFrame.pack(side=RIGHT, anchor=NW, pady=20)
 
 
 # TasksLabel - Displays a Label on the Screen called "Tasks:"
-TasksLabel = Label(TasksFrame, text="Tasks:", font=("Arial", 18))
+TasksLabel = Label(TasksFrame, text="Tasks:", font=("Arial", 20, 'bold'), bg="#5856D6", fg="Whitesmoke")
 TasksLabel.pack()
 
 
 # ListBoxForTDList - Displays a Listbox Widget on the Screen or Showing the Tasks That the User Has Entered
-ListBoxForTDList = Listbox(TasksFrame, width=55, height=30)
+ListBoxForTDList = Listbox(TasksFrame, width=55, height=30, bd=2)
 ListBoxForTDList.pack()
 
 
@@ -263,12 +306,12 @@ StatusBar.config(bg="Dodgerblue")
 StatusBar.pack(fill=X, side=BOTTOM, ipady=2)
 
 
-# Vertical Scrollbar
+# Vertical Scrollbar For Notes
 VerticalScrollbar = Scrollbar(NotesFrame)
 VerticalScrollbar.pack(side=RIGHT, fill=Y)
 
 
-# Horizontal Scrollbar
+# Horizontal Scrollbar For Notes
 HorizontalScrollbar = Scrollbar(NotesFrame, orient="horizontal")
 HorizontalScrollbar.pack(side=BOTTOM, fill=X)
 
