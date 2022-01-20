@@ -137,7 +137,7 @@ def DeleteTaskFunc():
 
 # To-Do List: Save Tasks Function
 def SaveTasksFunc():
-    file = 1
+    UserFile_ToDoList = filedialog.asksaveasfilename(title="Save To-Do List As File", filetypes=(("Dat Files", "*.dat"), ("All Files", "*.*")))
 
 
 '''
