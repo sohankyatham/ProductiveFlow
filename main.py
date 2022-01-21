@@ -23,6 +23,11 @@ global OpenFileName
 OpenFileName = False
 
 
+# Global SelectedText - used for storing any selected text and then pasting that text into the TextBoxForNotes
+global SelectedText
+SelectedText = False
+
+
 
 '''
 Functions for MenuBar Options
@@ -166,6 +171,59 @@ def ToggleWordWrap(*args):
         # Turn off Check Mark if the Function is disabled
         WordWrap_CheckMark.set(False)
 root.bind("<Alt-Key-z>", ToggleWordWrap)
+
+
+
+# EditMenu: Cut Text Function
+def CutText(e):
+    global SelectedText
+    # Check to see if keyboard shortcut was used
+    if e:
+        SelectedText = root.clipboard_get()
+    else:
+        # Grab selected text - then copy that text and remove it from TextBoxForNotes
+        if TextBoxForNotes.selection_get():
+            SelectedText = TextBoxForNotes.selection_get()
+            TextBoxForNotes.delete("sel.first", "sel.last")
+            # If copy option is used from edit menu and clear clipboard
+            root.clipboard_clear()
+            root.clipboard_append(SelectedText)
+root.bind("<Control-Key-x>", CutText)
+
+
+# EditMenu: Copy Text Function
+def CopyText(e):
+    global SelectedText
+    # Check to see if the keyboard shortcut was used
+    if e:
+        SelectedText = root.clipboard_get()
+    # Check to see if there is selected text - if there is then copy it
+    if TextBoxForNotes.selection_get():
+        SelectedText = TextBoxForNotes.selection_get()
+        # If copy option is used from edit menu and clear clipboard
+        root.clipboard_clear()
+        root.clipboard_append(SelectedText)
+root.bind("<Control-Key-c>", CopyText)
+
+
+# EditMenu: Paste Text Function
+def PasteText(e):
+    global SelectedText
+    # Check to see if shortcut is used
+    if e:
+        SelectedText = root.clipboard_get()
+    else:
+        # Paste the Selected Text into the Cursor Position
+        if SelectedText:
+            CursorPosition = TextBoxForNotes.index(INSERT)
+            TextBoxForNotes.insert(CursorPosition, SelectedText)
+root.bind("<Control-Key-v>", PasteText)
+
+
+# EditMenu: Select All Function
+def SelectAll(e):
+    TextBoxForNotes.tag_add("sel", 1.0, "end")
+root.bind("<Control-Key-a>", SelectAll)
 
 
 
@@ -406,11 +464,11 @@ MenuBar.add_cascade(label="Edit", menu=EditMenu)
 EditMenu.add_command(label="Undo", accelerator="Ctrl+Z", command=TextBoxForNotes.edit_undo)
 EditMenu.add_command(label="Redo", accelerator="Ctrl+Y", command=TextBoxForNotes.edit_redo)
 EditMenu.add_separator()
-EditMenu.add_command(label="Cut", accelerator="Ctrl+X", command=None)
-EditMenu.add_command(label="Copy", accelerator="Ctrl+C", command=None)
-EditMenu.add_command(label="Paste", accelerator="Ctrl+V", command=None)
+EditMenu.add_command(label="Cut", accelerator="Ctrl+X", command=lambda: CutText(False))
+EditMenu.add_command(label="Copy", accelerator="Ctrl+C", command=lambda: CopyText(False))
+EditMenu.add_command(label="Paste", accelerator="Ctrl+V", command=lambda: PasteText(False))
 EditMenu.add_separator()
-EditMenu.add_command(label="Select All", accelerator="Ctrl+A", command=None)
+EditMenu.add_command(label="Select All", accelerator="Ctrl+A", command=lambda: SelectAll(True))
 
 
 
