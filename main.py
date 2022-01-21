@@ -125,7 +125,6 @@ def ExitFunc(*args):
             root.destroy()
         else:
             pass
-
 root.bind("<Alt-Key-F4>", ExitFunc)
 
 
@@ -441,6 +440,7 @@ TabControl.add(NotesFrame, text="Notes")
 
 # Word And Character Count
 InitWordCount()
+
 
 # Initialize Screen
 root.mainloop()
