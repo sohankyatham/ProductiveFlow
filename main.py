@@ -32,7 +32,11 @@ Functions for MenuBar Options
 
 # FileMenu: New File Function
 def NewFileFunc(*args):
-    TextBoxForNotes.delete("1.0", END) 
+    global OpenFileName
+
+    OpenFileName = False
+    TextBoxForNotes.delete("1.0", END)  
+
 root.bind('<Control-Key-n>', NewFileFunc)
 
 
@@ -61,7 +65,7 @@ root.bind('<Control-Key-o>', OpenFileFunc)
 
 # FileMenu: Save File Function
 def SaveFileFunc(*args):
-    global OpenFileStatusName
+    global OpenFileName
 
     # If File has been opened then save
     if OpenFileName:
@@ -85,16 +89,84 @@ def SaveAsFunc(*args):
 root.bind('<Control-Shift-S>', SaveAsFunc)
 
 
-# FileMenu: Auto Save Function
+# FileMenu: Declare Auto Save Function
 def DeclareAutoSaveFunc():
-    print("Auto saving...")
+    global OpenFileName
+    # Declare the Auto Save function - write code for what the Auto Save function is supposed to do
+    if OpenFileName:
+        FileContentData = TextBoxForNotes.get("1.0", "end-1c")
+        with open(OpenFileName, "w") as SaveContent:
+            SaveContent.write(FileContentData)
+
+
+# FileMenu: Initialize Auto Save Function
+def InitAutoSave():
+    if AutoSave_CheckMark.get():
+        DeclareAutoSaveFunc()
+        TextBoxForNotes.after(100, InitAutoSave)
+    else: 
+        # Undeclare the Python Function - Turn OFF the AutoSave Feature
+        AutoSave_CheckMark.set(False)
+
 
 
 # FileMenu: Exit App Function 
 def ExitFunc(*args):
+    global OpenFileName
+
     # Open Prompt Asking User whether they wanna save their work before closing 
-    root.destroy()
+    ExitTitle = "Do you want to save the changes you made to this file?"
+    ExitMessage = "Your changes will be lost if you don't save this file. Are you sure you still want to exit this application?"
+
+    if OpenFileName:
+        ExitConfirmation = messagebox.askquestion(ExitTitle, ExitMessage)
+        
+        if ExitConfirmation == "yes":
+            root.destroy()
+        else:
+            pass
+
 root.bind("<Alt-Key-F4>", ExitFunc)
+
+
+
+# ToolsMenu: Declare Word Count and Character Count Function
+def DeclareWordCount():
+    # Get Content from TextBoxForNotes - Turn String Into a Number: of characters and words
+    TextContent_ForWordCount = TextBoxForNotes.get("1.0", END)
+    # String to Number 
+    CharactersInTextBoxForNotes = len(TextContent_ForWordCount)    
+    WordsInTextBoxForNotes = len(TextContent_ForWordCount.split())
+    # Config in Status Bar
+    StatusBar.config(text=str(CharactersInTextBoxForNotes-1) + " Characters, " + str(WordsInTextBoxForNotes) + " Words, ")
+
+
+# ToolsMenu: Initialize Word Count Function
+def InitWordCount():
+    # Check if the function is already active, if it is, then turn of word count
+    if WordCount_CheckMark.get():
+        DeclareWordCount()
+        StatusBar.after(100, InitWordCount)
+    else: 
+        WordCount_CheckMark.set(False)
+        StatusBar.config(text="")
+
+
+# ToolsMenu: Toggle Word Wrap Function
+def ToggleWordWrap(*args):
+
+    # If there is no word wrap then add word wrap
+    if TextBoxForNotes.cget("wrap") == "none":
+        TextBoxForNotes.configure(wrap="word")
+        # Turn on Check Mark if the Function is called 
+        WordWrap_CheckMark.set(True)
+
+    # If there is word wrap then take out word wrap
+    elif TextBoxForNotes.cget("wrap") == "word":
+        TextBoxForNotes.configure(wrap="none")
+        # Turn off Check Mark if the Function is disabled
+        WordWrap_CheckMark.set(False)
+root.bind("<Alt-Key-z>", ToggleWordWrap)
 
 
 
@@ -103,8 +175,24 @@ def AboutScreenFunc():
     # About Screen Window
     AboutScreen = Toplevel(root)
     AboutScreen.title("About")
-    AboutScreen.geometry("300x300")
+    AboutScreen.geometry("300x200")
     AboutScreen.resizable(0,0)
+
+    # AboutHeader - Displays a Label called "ProductiveFlow"
+    AboutHeader = Label(AboutScreen, text="ProductiveFlow", font=("Arial", 30))
+    AboutHeader.pack(pady=25)
+
+    # AboutHeaderAttribution
+    AboutHeaderAttribtion = Label(AboutScreen, text="By: Sohan Kyatham", width=16, font=("Arial", 12))
+    AboutHeaderAttribtion.pack()
+
+    # AboutVersion
+    AboutVersion = Label(AboutScreen, text="Version: 1.0.0", width=16, font=("Arial", 12))
+    AboutVersion.pack()
+
+    # Operating System Version
+    AboutOSVersion = Label(AboutScreen, text="OS: Windows", width=16, font=("Arial", 12))
+    AboutOSVersion.pack()
 
     # Mainloop for AboutScreen
     AboutScreen.mainloop()
@@ -149,6 +237,12 @@ MenuBar = Menu(root)
 root.config(menu=MenuBar)
 
 
+
+# Check Marks for Options in ToolsMenu
+AutoSave_CheckMark = BooleanVar()
+AutoSave_CheckMark.set(False)
+
+
 # File Menu Option
 FileMenu = Menu(MenuBar, tearoff=False)
 # Add the File Menu to the MenuBar
@@ -159,7 +253,7 @@ FileMenu.add_separator()
 FileMenu.add_command(label="Save File", accelerator="Ctrl+S", command=SaveFileFunc)
 FileMenu.add_command(label="Save As", accelerator="Ctrl+Shift S", command=SaveAsFunc)
 FileMenu.add_separator()
-FileMenu.add_command(label="Auto Save", command=DeclareAutoSaveFunc)
+FileMenu.add_checkbutton(label="Auto Save", onvalue=1, offvalue=0, variable=AutoSave_CheckMark, command=InitAutoSave)
 FileMenu.add_command(label="Exit Window", accelerator="Alt-F4", command=ExitFunc)
 
 
@@ -177,12 +271,21 @@ EditMenu.add_separator()
 EditMenu.add_command(label="Select All", accelerator="Ctrl+A", command=None)
 
 
+
+# Check Marks for Options in ToolsMenu
+WordCount_CheckMark = BooleanVar()
+WordCount_CheckMark.set(True)
+
+WordWrap_CheckMark = BooleanVar()
+WordWrap_CheckMark.set(False)
+
+
 # Tools Menu Option
 ToolsMenu = Menu(MenuBar, tearoff=False)
 # Add the Tools Menu to the MenuBar
 MenuBar.add_cascade(label="Tools", menu=ToolsMenu)
-ToolsMenu.add_command(label="Word Count", command=None)
-ToolsMenu.add_command(label="Toggle Word Wrap", accelerator="Alt+Z", command=None)
+ToolsMenu.add_checkbutton(label="Word Count", onvalue=1, offvalue=0, variable=WordCount_CheckMark, command=InitWordCount)
+ToolsMenu.add_checkbutton(label="Toggle Word Wrap", accelerator="Alt+Z", onvalue=1, offvalue=0, variable=WordWrap_CheckMark, command=ToggleWordWrap)
 
 
 # Help Menu
@@ -301,7 +404,7 @@ NotesFrame.pack(fill="both", expand=1)
 
 
 # StatusBar - For Displaying Word and Character Count
-StatusBar = Label(NotesFrame, text="CHARACTER: WORD:", anchor=W)
+StatusBar = Label(NotesFrame, text="", anchor=W)
 StatusBar.config(bg="Dodgerblue")
 StatusBar.pack(fill=X, side=BOTTOM, ipady=2)
 
@@ -335,6 +438,9 @@ HorizontalScrollbar.config(command=TextBoxForNotes.xview)
 # Add Notes Frame to Tab Control
 TabControl.add(NotesFrame, text="Notes")
 
+
+# Word And Character Count
+InitWordCount()
 
 # Initialize Screen
 root.mainloop()
