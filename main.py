@@ -227,77 +227,8 @@ def SaveTasksFunc():
     UserFile_ToDoList = filedialog.asksaveasfilename(title="Save To-Do List As File", filetypes=(("Dat Files", "*.dat"), ("All Files", "*.*")))
 
 
-'''
-MenuBar for Program
-'''
 
-# Menubar - Place for Placing Menu Options
-MenuBar = Menu(root)
-root.config(menu=MenuBar)
-
-
-
-# Check Marks for Options in ToolsMenu
-AutoSave_CheckMark = BooleanVar()
-AutoSave_CheckMark.set(False)
-
-
-# File Menu Option
-FileMenu = Menu(MenuBar, tearoff=False)
-# Add the File Menu to the MenuBar
-MenuBar.add_cascade(label="File", menu=FileMenu)
-FileMenu.add_command(label="New File", accelerator="Ctrl+N", command=NewFileFunc)
-FileMenu.add_command(label="Open File", accelerator="Ctrl+O", command=OpenFileFunc)
-FileMenu.add_separator()
-FileMenu.add_command(label="Save File", accelerator="Ctrl+S", command=SaveFileFunc)
-FileMenu.add_command(label="Save As", accelerator="Ctrl+Shift S", command=SaveAsFunc)
-FileMenu.add_separator()
-FileMenu.add_checkbutton(label="Auto Save", onvalue=1, offvalue=0, variable=AutoSave_CheckMark, command=InitAutoSave)
-FileMenu.add_command(label="Exit Window", accelerator="Alt-F4", command=ExitFunc)
-
-
-# Edit Menu Option
-EditMenu = Menu(MenuBar, tearoff=False)
-# Add the Edit Menu to the MenuBar
-MenuBar.add_cascade(label="Edit", menu=EditMenu)
-EditMenu.add_command(label="Undo", accelerator="Ctrl+Z", command=None)
-EditMenu.add_command(label="Redo", accelerator="Ctrl+Y", command=None)
-EditMenu.add_separator()
-EditMenu.add_command(label="Cut", accelerator="Ctrl+X", command=None)
-EditMenu.add_command(label="Copy", accelerator="Ctrl+C", command=None)
-EditMenu.add_command(label="Paste", accelerator="Ctrl+V", command=None)
-EditMenu.add_separator()
-EditMenu.add_command(label="Select All", accelerator="Ctrl+A", command=None)
-
-
-
-# Check Marks for Options in ToolsMenu
-WordCount_CheckMark = BooleanVar()
-WordCount_CheckMark.set(True)
-
-WordWrap_CheckMark = BooleanVar()
-WordWrap_CheckMark.set(False)
-
-
-# Tools Menu Option
-ToolsMenu = Menu(MenuBar, tearoff=False)
-# Add the Tools Menu to the MenuBar
-MenuBar.add_cascade(label="Tools", menu=ToolsMenu)
-ToolsMenu.add_checkbutton(label="Word Count", onvalue=1, offvalue=0, variable=WordCount_CheckMark, command=InitWordCount)
-ToolsMenu.add_checkbutton(label="Toggle Word Wrap", accelerator="Alt+Z", onvalue=1, offvalue=0, variable=WordWrap_CheckMark, command=ToggleWordWrap)
-
-
-# Help Menu
-HelpMenu = Menu(MenuBar, tearoff=False)
-# Add the Help Menu to the MenuBar
-MenuBar.add_cascade(label="Help", menu=HelpMenu)
-HelpMenu.add_command(label="Documentation", command=None)
-HelpMenu.add_command(label="Release Notes", command=None)
-HelpMenu.add_separator()
-HelpMenu.add_command(label="About", command=AboutScreenFunc)
-
-
-# Tab Control - Place to Hold Tabs
+# Tab Control - Place to Hold Tabs (Calendar Tab, To-Do List Tab, Notes Tab, Stopwatch Tab, and Timer Tab)
 TabControl = ttk.Notebook(root)
 TabControl.pack()
 
@@ -436,6 +367,78 @@ HorizontalScrollbar.config(command=TextBoxForNotes.xview)
 
 # Add Notes Frame to Tab Control
 TabControl.add(NotesFrame, text="Notes")
+
+
+
+'''
+MenuBar for Program
+'''
+
+# Menubar - Place for Placing Menu Options
+MenuBar = Menu(root)
+root.config(menu=MenuBar)
+
+
+
+# Check Marks for Options in FileMenu
+AutoSave_CheckMark = BooleanVar()
+AutoSave_CheckMark.set(False)
+
+
+# File Menu Option
+FileMenu = Menu(MenuBar, tearoff=False)
+# Add the File Menu to the MenuBar
+MenuBar.add_cascade(label="File", menu=FileMenu)
+FileMenu.add_command(label="New File", accelerator="Ctrl+N", command=NewFileFunc)
+FileMenu.add_command(label="Open File", accelerator="Ctrl+O", command=OpenFileFunc)
+FileMenu.add_separator()
+FileMenu.add_command(label="Save File", accelerator="Ctrl+S", command=SaveFileFunc)
+FileMenu.add_command(label="Save As", accelerator="Ctrl+Shift S", command=SaveAsFunc)
+FileMenu.add_separator()
+FileMenu.add_checkbutton(label="Auto Save", onvalue=1, offvalue=0, variable=AutoSave_CheckMark, command=InitAutoSave)
+FileMenu.add_command(label="Exit Window", accelerator="Alt-F4", command=ExitFunc)
+
+
+# Edit Menu Option
+EditMenu = Menu(MenuBar, tearoff=False)
+# Add the Edit Menu to the MenuBar
+MenuBar.add_cascade(label="Edit", menu=EditMenu)
+EditMenu.add_command(label="Undo", accelerator="Ctrl+Z", command=TextBoxForNotes.edit_undo)
+EditMenu.add_command(label="Redo", accelerator="Ctrl+Y", command=TextBoxForNotes.edit_redo)
+EditMenu.add_separator()
+EditMenu.add_command(label="Cut", accelerator="Ctrl+X", command=None)
+EditMenu.add_command(label="Copy", accelerator="Ctrl+C", command=None)
+EditMenu.add_command(label="Paste", accelerator="Ctrl+V", command=None)
+EditMenu.add_separator()
+EditMenu.add_command(label="Select All", accelerator="Ctrl+A", command=None)
+
+
+
+# Check Marks for Options in ToolsMenu
+WordCount_CheckMark = BooleanVar()
+WordCount_CheckMark.set(True)
+
+WordWrap_CheckMark = BooleanVar()
+WordWrap_CheckMark.set(False)
+
+
+# Tools Menu Option
+ToolsMenu = Menu(MenuBar, tearoff=False)
+# Add the Tools Menu to the MenuBar
+MenuBar.add_cascade(label="Tools", menu=ToolsMenu)
+ToolsMenu.add_checkbutton(label="Word Count", onvalue=1, offvalue=0, variable=WordCount_CheckMark, command=InitWordCount)
+ToolsMenu.add_checkbutton(label="Toggle Word Wrap", accelerator="Alt+Z", onvalue=1, offvalue=0, variable=WordWrap_CheckMark, command=ToggleWordWrap)
+
+
+# Help Menu
+HelpMenu = Menu(MenuBar, tearoff=False)
+# Add the Help Menu to the MenuBar
+MenuBar.add_cascade(label="Help", menu=HelpMenu)
+HelpMenu.add_command(label="Documentation", command=None)
+HelpMenu.add_command(label="Release Notes", command=None)
+HelpMenu.add_separator()
+HelpMenu.add_command(label="About", command=AboutScreenFunc)
+
 
 
 # Word And Character Count
