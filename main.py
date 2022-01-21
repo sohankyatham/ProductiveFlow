@@ -6,9 +6,10 @@
 # Imports
 from tkinter import *
 from tkinter import ttk
-from tkinter import messagebox
 from tkinter import filedialog
+from tkinter import messagebox
 import tkinter.font as tkfont
+import webbrowser
 
 
 # Create Screen
@@ -227,6 +228,16 @@ root.bind("<Control-Key-a>", SelectAll)
 
 
 
+# HelpMenu: Documentation Function 
+def DocumentationFunc(): # In the future create a new tab directly in the ProductivityFlow Application and include the link
+    webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/README.md")
+
+
+# HelpMenu: Release Notes Function
+def ReleaseNotesFunc():
+    webbrowser.open("www.google.com")
+
+    
 # HelpMenu: About Screen Function
 def AboutScreenFunc():
     # About Screen Window
@@ -492,8 +503,8 @@ ToolsMenu.add_checkbutton(label="Toggle Word Wrap", accelerator="Alt+Z", onvalue
 HelpMenu = Menu(MenuBar, tearoff=False)
 # Add the Help Menu to the MenuBar
 MenuBar.add_cascade(label="Help", menu=HelpMenu)
-HelpMenu.add_command(label="Documentation", command=None)
-HelpMenu.add_command(label="Release Notes", command=None)
+HelpMenu.add_command(label="Documentation", command=DocumentationFunc)
+HelpMenu.add_command(label="Release Notes", command=ReleaseNotesFunc)
 HelpMenu.add_separator()
 HelpMenu.add_command(label="About", command=AboutScreenFunc)
 
