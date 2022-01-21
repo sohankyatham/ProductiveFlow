@@ -20,14 +20,19 @@ root.resizable(False, False)
 
 
 # Global OpenFileName - used for finding name/status of opened file and using it later in code for functions such as saving a file and etc
-global OpenFileName
 OpenFileName = False
 
 
 # Global SelectedText - used for storing any selected text and then pasting that text into the TextBoxForNotes
-global SelectedText
 SelectedText = False
 
+
+# Global CounterForStopwatch - 
+CounterForStopwatch = -1
+
+
+# Global StopwatchRunningStatus - 
+StopwatchRunningStatus = False
 
 
 '''
@@ -230,14 +235,14 @@ root.bind("<Control-Key-a>", SelectAll)
 
 # HelpMenu: Documentation Function 
 def DocumentationFunc(): # In the future create a new tab directly in the ProductivityFlow Application and include the link
-    webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/README.md")
+    webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/Documentation.md")
 
 
 # HelpMenu: Release Notes Function
 def ReleaseNotesFunc():
     webbrowser.open("www.google.com")
 
-    
+
 # HelpMenu: About Screen Function
 def AboutScreenFunc():
     # About Screen Window
@@ -248,7 +253,7 @@ def AboutScreenFunc():
 
     # AboutHeader - Displays a Label called "ProductiveFlow"
     AboutHeader = Label(AboutScreen, text="ProductiveFlow", font=("Arial", 30))
-    AboutHeader.pack(pady=25)
+    AboutHeader.pack(pady=5)
 
     # AboutHeaderAttribution
     AboutHeaderAttribtion = Label(AboutScreen, text="By: Sohan Kyatham", width=16, font=("Arial", 12))
@@ -261,6 +266,14 @@ def AboutScreenFunc():
     # Operating System Version
     AboutOSVersion = Label(AboutScreen, text="OS: Windows", width=16, font=("Arial", 12))
     AboutOSVersion.pack()
+
+    # View README.md File Function
+    def ViewREADMEFunc():
+        webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/README.md")
+
+    # View README.md Button
+    ViewREADME = Button(AboutScreen, text="View README.md file on GitHub", width=26, font=("Arial", 12), bg="#26aceb", command=ViewREADMEFunc)
+    ViewREADME.pack(pady=15)
 
     # Mainloop for AboutScreen
     AboutScreen.mainloop()
@@ -294,6 +307,28 @@ def DeleteTaskFunc():
 # To-Do List: Save Tasks Function
 def SaveTasksFunc():
     UserFile_ToDoList = filedialog.asksaveasfilename(title="Save To-Do List As File", filetypes=(("Dat Files", "*.dat"), ("All Files", "*.*")))
+
+
+
+'''
+Functions for Stopwatch
+'''
+
+
+
+# Stopwatch: Start Stopwatch Function
+def StartStopwatchFunc():
+    pass
+
+
+# Stopwatch: Stop Stopwatch Function
+def StopStopwatchFunc():
+    pass
+
+
+# Stopwatch: Reset Stopwatch Function
+def ResetStopwatchFunc():
+    pass
 
 
 
@@ -339,13 +374,13 @@ TitleLabel.pack(side="top", fill=BOTH)
 
 
 # ManageTaskFrame - A Frame for Storing all the Widgets Regarding Adding/Deleting Tasks Functions
-ManageTaskFrame = Frame(ToDoListFrame, width=250, height=500, bg="#26aceb")
+ManageTaskFrame = Frame(ToDoListFrame, width=250, height=500, bg="lightgray")
 ManageTaskFrame.pack(side=LEFT, anchor=NE, pady=20)
 
 
 # EnterTaskLabel - Displays a Label on the Screen called "Enter A Task"
 EnterTaskLabel = Label(ManageTaskFrame, text="Enter A Task:", width=14, font=("Arial", 20, 'bold'), bg="#26aceb", fg="Whitesmoke")
-EnterTaskLabel.pack()
+EnterTaskLabel.pack(padx=5)
 
 
 # EnterTaskEntry - Displays an Text Widget Where User Can Enter A Task
@@ -438,6 +473,63 @@ HorizontalScrollbar.config(command=TextBoxForNotes.xview)
 TabControl.add(NotesFrame, text="Notes")
 
 
+"""
+******************************************************************
+Stopwatch Section
+******************************************************************
+"""
+
+
+# Stopwatch Frame - A Frame to Place Stopwatch
+StopwatchFrame = Frame(TabControl, width="590", height="590", bg="lightblue")
+StopwatchFrame.pack(fill="both", expand=1)
+
+
+# Current Time (Time Lapsed) Label
+TimeLapsedLabel = Label(StopwatchFrame, text="00:00.00", font=("Arial", 65), bg="lightblue")
+TimeLapsedLabel.pack()
+
+
+# Stopwatch Buttons Frame - A Frame in StopwatchFrame to Place Buttons
+StopwatchBtnsFrame = Frame(StopwatchFrame, width=450, height=450, bg="lightblue")
+StopwatchBtnsFrame.pack(pady=40)
+
+
+# Start Stopwatch Button
+StartStopwatchBtn = Button(StopwatchBtnsFrame, text="Start", width=18, font=("Arial", 28), bg="#15e650", command=StartStopwatchFunc)
+StartStopwatchBtn.pack(pady=5)
+
+
+# Stop Stopwatch Button
+StopStopwatchBtn = Button(StopwatchBtnsFrame, text="Stop", width=18, font=("Arial", 28), background="#e63030", command=StopStopwatchFunc)
+StopStopwatchBtn.pack(pady=5)
+
+
+# Reset Stopwatch Button
+ResetStopwatchButton = Button(StopwatchBtnsFrame, text="Reset", width=18, font=("Arial", 28), background="lightgray", command=ResetStopwatchFunc)
+ResetStopwatchButton.pack(pady=5)
+
+
+# Add Stopwatch Frame to Tab Control
+TabControl.add(StopwatchFrame, text="Stopwatch")
+
+
+"""
+******************************************************************
+Timer Section
+******************************************************************
+"""
+
+
+# Timer Frame - A Frame to Place Timer
+TimerFrame = Frame(TabControl, width="590", height="590", bg="royalblue")
+TimerFrame.pack(fill="both", expand=1)
+
+
+# Add Stopwatch Frame to Tab Control
+TabControl.add(TimerFrame, text="Timer")
+
+
 
 '''
 MenuBar for Program
@@ -497,6 +589,17 @@ ToolsMenu = Menu(MenuBar, tearoff=False)
 MenuBar.add_cascade(label="Tools", menu=ToolsMenu)
 ToolsMenu.add_checkbutton(label="Word Count", onvalue=1, offvalue=0, variable=WordCount_CheckMark, command=InitWordCount)
 ToolsMenu.add_checkbutton(label="Toggle Word Wrap", accelerator="Alt+Z", onvalue=1, offvalue=0, variable=WordWrap_CheckMark, command=ToggleWordWrap)
+
+
+# Stopwatch Menu
+StopwatchMenu = Menu(MenuBar, tearoff=False)
+# Add the Stopwatch Menu to the MenuBar
+MenuBar.add_cascade(label="Stopwatch", menu=StopwatchMenu)
+StopwatchMenu.add_command(label="Start Stopwatch", command=StartStopwatchFunc)
+StopwatchMenu.add_separator()
+StopwatchMenu.add_command(label="Stop Stopwatch", command=StopStopwatchFunc)
+StopwatchMenu.add_separator()
+StopwatchMenu.add_command(label="Reset Stopwatch", command=ResetStopwatchFunc)
 
 
 # Help Menu
