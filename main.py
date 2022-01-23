@@ -9,14 +9,34 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 import tkinter.font as tkfont
+#from datetime import datetime
 import webbrowser
 
 
-# Create Screen
+
+# Create Window
 root = Tk()
-root.geometry("600x600")
+
+
+# Set up Geometry and Center the Window
+Window_Width = 600
+Window_Height = 600
+
+# Get Screen Width and Height
+Screen_Width = root.winfo_screenwidth()
+Screen_Height = root.winfo_screenheight()
+
+# Calculate the Screen_x and Screen_y Coordinate Positions
+x = (Screen_Width / 2) - (Window_Width / 2)
+y = (Screen_Height / 2) - ((Window_Height / 2) + 50)
+
+# Place the Window in the Center of the Screen
+root.geometry("%dx%d+%d+%d" % (Window_Width, Window_Height, x, y))
+
+
 root.title("ProductiveFlow")
 root.resizable(False, False)
+
 
 
 # Global OpenFileName - used for finding name/status of opened file and using it later in code for functions such as saving a file and etc
@@ -27,12 +47,15 @@ OpenFileName = False
 SelectedText = False
 
 
-# Global CounterForStopwatch - 
-CounterForStopwatch = -1
-
-
-# Global StopwatchRunningStatus - 
+# Global StopwatchRunningStatus - used for checking if the Stopwatch is running or not
 StopwatchRunningStatus = False
+
+
+# Global Hours, Minutes, and Seconds - used for
+Stopwatch_Hours = 0
+Stopwatch_Minutes = 0
+Stopwatch_Seconds = 0
+
 
 
 '''
@@ -309,6 +332,11 @@ def SaveTasksFunc():
     UserFile_ToDoList = filedialog.asksaveasfilename(title="Save To-Do List As File", filetypes=(("Dat Files", "*.dat"), ("All Files", "*.*")))
 
 
+# To-Do List: Load Tasks Function
+def LoadTasksFunc():
+    pass
+
+
 
 '''
 Functions for Stopwatch
@@ -318,17 +346,60 @@ Functions for Stopwatch
 
 # Stopwatch: Start Stopwatch Function
 def StartStopwatchFunc():
-    pass
+    global StopwatchRunningStatus
+
+    if not StopwatchRunningStatus:
+        UpdateStopwatchFunc()
+        StopwatchRunningStatus = True
+
+    # Disable StartStopwachBtn
+    StartStopwatchBtn["state"] = "disabled"
+    PauseStopwatchBtn["state"] = "normal"
+    StopStopwatchBtn["state"] = "normal"
+    ResetStopwatchBtn["state"] = "normal"
+    
+
+# Stopwatch: Pause Sopwatch Function
+def PauseStopwatchFunc():
+    global StopwatchRunningStatus
+
+    if StopwatchRunningStatus:
+        StopwatchRunningStatus = False
+
+    # Disable PauseStopwachBtn
+    StartStopwatchBtn["state"] = "normal"
+    PauseStopwatchBtn["state"] = "disabled"
+    StopStopwatchBtn["state"] = "normal"
+    ResetStopwatchBtn["state"] = "normal"
 
 
 # Stopwatch: Stop Stopwatch Function
 def StopStopwatchFunc():
-    pass
+    global StopwatchRunningStatus
+
+    # Disable StartStopwachBtn
+    StartStopwatchBtn["state"] = "normal"
+    PauseStopwatchBtn["state"] = "normal"
+    StopStopwatchBtn["state"] = "disabled"
+    ResetStopwatchBtn["state"] = "normal"
 
 
 # Stopwatch: Reset Stopwatch Function
 def ResetStopwatchFunc():
-    pass
+    global StopwatchRunningStatus
+
+    # Disable StartStopwachBtn
+    StartStopwatchBtn["state"] = "normal"
+    PauseStopwatchBtn["state"] = "normal"
+    StopStopwatchBtn["state"] = "normal"
+    ResetStopwatchBtn["state"] = "disabled"
+
+
+# Stopwatch: Update Stopwatch Function
+def UpdateStopwatchFunc():
+    global StopwatchRunningStatus
+    global Stopwatch_Hours, Stopwatch_Minutes, Stopwatch_Seconds
+    
 
 
 
@@ -401,6 +472,11 @@ DeleteTaskBtn.pack()
 # SaveTasksBtn - Displays a Button called "Save Tasks" Which Saves the Tasks to a File Which can be opened later
 SaveTasksBtn = Button(ManageTaskFrame, text="Save Tasks", font=("Arial", 12), command=SaveTasksFunc)
 SaveTasksBtn.pack()
+
+
+# LoadTasksBtn - Displays a Button called "Load Tasks" Which Loads the Tasks into the ListBoxForTDList
+LoadTasksBtn = Button(ManageTaskFrame, text="Load Tasks", font=("Arial", 12), command=LoadTasksFunc)
+LoadTasksBtn.pack()
 
 
 '''Tasks Section'''
@@ -486,7 +562,7 @@ StopwatchFrame.pack(fill="both", expand=1)
 
 
 # Current Time (Time Lapsed) Label
-TimeLapsedLabel = Label(StopwatchFrame, text="00:00.00", font=("Arial", 65), bg="lightblue")
+TimeLapsedLabel = Label(StopwatchFrame, text="00:00:00", font=("Arial", 65), bg="lightblue")
 TimeLapsedLabel.pack()
 
 
@@ -496,18 +572,23 @@ StopwatchBtnsFrame.pack(pady=40)
 
 
 # Start Stopwatch Button
-StartStopwatchBtn = Button(StopwatchBtnsFrame, text="Start", width=18, font=("Arial", 28), bg="#15e650", command=StartStopwatchFunc)
+StartStopwatchBtn = Button(StopwatchBtnsFrame, text="Start", width=18, font=("Arial", 28), bg="#15e650", bd=1, command=StartStopwatchFunc)
 StartStopwatchBtn.pack(pady=5)
 
 
+# Pause Stopwatch Button
+PauseStopwatchBtn = Button(StopwatchBtnsFrame, text="Pause", width=18, font=("Arial", 28), background="#ff8000", bd=1, command=PauseStopwatchFunc)
+PauseStopwatchBtn.pack(pady=5)
+
+
 # Stop Stopwatch Button
-StopStopwatchBtn = Button(StopwatchBtnsFrame, text="Stop", width=18, font=("Arial", 28), background="#e63030", command=StopStopwatchFunc)
+StopStopwatchBtn = Button(StopwatchBtnsFrame, text="Stop", width=18, font=("Arial", 28), background="#e63030", bd=1, command=StopStopwatchFunc)
 StopStopwatchBtn.pack(pady=5)
 
 
 # Reset Stopwatch Button
-ResetStopwatchButton = Button(StopwatchBtnsFrame, text="Reset", width=18, font=("Arial", 28), background="lightgray", command=ResetStopwatchFunc)
-ResetStopwatchButton.pack(pady=5)
+ResetStopwatchBtn = Button(StopwatchBtnsFrame, text="Reset", width=18, font=("Arial", 28), background="lightgray", bd=1, command=ResetStopwatchFunc)
+ResetStopwatchBtn.pack(pady=5)
 
 
 # Add Stopwatch Frame to Tab Control
@@ -596,6 +677,8 @@ StopwatchMenu = Menu(MenuBar, tearoff=False)
 # Add the Stopwatch Menu to the MenuBar
 MenuBar.add_cascade(label="Stopwatch", menu=StopwatchMenu)
 StopwatchMenu.add_command(label="Start Stopwatch", command=StartStopwatchFunc)
+StopwatchMenu.add_separator()
+StopwatchMenu.add_command(label="Pause Stopwatch", command=PauseStopwatchFunc)
 StopwatchMenu.add_separator()
 StopwatchMenu.add_command(label="Stop Stopwatch", command=StopStopwatchFunc)
 StopwatchMenu.add_separator()
