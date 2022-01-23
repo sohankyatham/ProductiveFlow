@@ -346,38 +346,28 @@ Functions for Stopwatch
 def StartStopwatchFunc():
     global StopwatchRunningStatus
 
+    # Start the Stopwatch
     if not StopwatchRunningStatus:
         UpdateStopwatchFunc()
         StopwatchRunningStatus = True
 
     # Disable StartStopwachBtn
     StartStopwatchBtn["state"] = "disabled"
-    PauseStopwatchBtn["state"] = "normal"
     StopStopwatchBtn["state"] = "normal"
     ResetStopwatchBtn["state"] = "normal"
     
 
 # Stopwatch: Pause Sopwatch Function
-def PauseStopwatchFunc():
+def StopStopwatchFunc():
     global StopwatchRunningStatus
 
+    # Stop Running the Stopwatch
     if StopwatchRunningStatus:
+        TimeLapsedLabel.after_cancel(UpdateStopwatchTime)
         StopwatchRunningStatus = False
 
     # Disable PauseStopwachBtn
     StartStopwatchBtn["state"] = "normal"
-    PauseStopwatchBtn["state"] = "disabled"
-    StopStopwatchBtn["state"] = "normal"
-    ResetStopwatchBtn["state"] = "normal"
-
-
-# Stopwatch: Stop Stopwatch Function
-def StopStopwatchFunc():
-    global StopwatchRunningStatus
-
-    # Disable StartStopwachBtn
-    StartStopwatchBtn["state"] = "normal"
-    PauseStopwatchBtn["state"] = "normal"
     StopStopwatchBtn["state"] = "disabled"
     ResetStopwatchBtn["state"] = "normal"
 
@@ -385,19 +375,51 @@ def StopStopwatchFunc():
 # Stopwatch: Reset Stopwatch Function
 def ResetStopwatchFunc():
     global StopwatchRunningStatus
+    global Stopwatch_Hours, Stopwatch_Minutes, Stopwatch_Seconds
+
+    # Stop Running the Stopwatch
+    if StopwatchRunningStatus:
+        TimeLapsedLabel.after_cancel(UpdateStopwatchTime)
+        StopwatchRunningStatus = False
+    
+    # Reset Time and TimeLapsedLabel
+    Stopwatch_Hours = 0
+    Stopwatch_Minutes = 0
+    Stopwatch_Seconds = 0
+
+    TimeLapsedLabel.config(text='00:00:00')
 
     # Disable StartStopwachBtn
     StartStopwatchBtn["state"] = "normal"
-    PauseStopwatchBtn["state"] = "normal"
     StopStopwatchBtn["state"] = "normal"
     ResetStopwatchBtn["state"] = "disabled"
 
 
 # Stopwatch: Update Stopwatch Function
 def UpdateStopwatchFunc():
-    global StopwatchRunningStatus
     global Stopwatch_Hours, Stopwatch_Minutes, Stopwatch_Seconds
-    
+    global UpdateStopwatchTime
+
+    # Update the Stopwatch
+    Stopwatch_Seconds += 1
+
+    if Stopwatch_Seconds == 60:
+        Stopwatch_Minutes += 1
+        Stopwatch_Seconds = 0
+    if Stopwatch_Minutes == 60:
+        Stopwatch_Hours += 1
+        Stopwatch_Minutes = 0
+
+    # Format the TimeLapsedLabel to Include Leading Zeros
+    Hours_StringValue = f'{Stopwatch_Hours}' if Stopwatch_Hours > 9 else f'0{Stopwatch_Hours}'
+    Minutes_StringValue = f'{Stopwatch_Minutes}' if Stopwatch_Minutes > 9 else f'0{Stopwatch_Minutes}'
+    Seconds_StringValue = f'{Stopwatch_Seconds}' if Stopwatch_Seconds > 9 else f'0{Stopwatch_Seconds}'
+
+    # Configure the TimeLapsedLabel
+    TimeLapsedLabel.config(text=Hours_StringValue + ':' + Minutes_StringValue + ':' + Seconds_StringValue)
+
+    # Update the TimeLapsedLabel after Every Second
+    UpdateStopwatchTime = TimeLapsedLabel.after(1000, UpdateStopwatchFunc)
 
 
 
@@ -574,11 +596,6 @@ StartStopwatchBtn = Button(StopwatchBtnsFrame, text="Start", width=18, font=("Ar
 StartStopwatchBtn.pack(pady=5)
 
 
-# Pause Stopwatch Button
-PauseStopwatchBtn = Button(StopwatchBtnsFrame, text="Pause", width=18, font=("Arial", 28), background="#ff8000", bd=1, command=PauseStopwatchFunc)
-PauseStopwatchBtn.pack(pady=5)
-
-
 # Stop Stopwatch Button
 StopStopwatchBtn = Button(StopwatchBtnsFrame, text="Stop", width=18, font=("Arial", 28), background="#e63030", bd=1, command=StopStopwatchFunc)
 StopStopwatchBtn.pack(pady=5)
@@ -675,8 +692,6 @@ StopwatchMenu = Menu(MenuBar, tearoff=False)
 # Add the Stopwatch Menu to the MenuBar
 MenuBar.add_cascade(label="Stopwatch", menu=StopwatchMenu)
 StopwatchMenu.add_command(label="Start Stopwatch", command=StartStopwatchFunc)
-StopwatchMenu.add_separator()
-StopwatchMenu.add_command(label="Pause Stopwatch", command=PauseStopwatchFunc)
 StopwatchMenu.add_separator()
 StopwatchMenu.add_command(label="Stop Stopwatch", command=StopStopwatchFunc)
 StopwatchMenu.add_separator()
