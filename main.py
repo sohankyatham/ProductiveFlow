@@ -9,7 +9,6 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 import tkinter.font as tkfont
-#from datetime import datetime
 import webbrowser
 
 
@@ -141,7 +140,6 @@ def InitAutoSave():
     else: 
         # Undeclare the Python Function - Turn OFF the AutoSave Feature
         AutoSave_CheckMark.set(False)
-
 
 
 # FileMenu: Exit App Function 
