@@ -623,7 +623,7 @@ TimerFrame.pack(fill="both", expand=1)
 
 
 # Timer Label 
-TimerLabel = Label(TimerFrame, text="Timer", font=("Arial", 50), bg="#d4ccc3")
+TimerLabel = Label(TimerFrame, text="00:00:00", font=("Arial", 50), bg="#d4ccc3")
 TimerLabel.pack()
 
 
