@@ -618,11 +618,98 @@ Timer Section
 
 
 # Timer Frame - A Frame to Place Timer
-TimerFrame = Frame(TabControl, width="590", height="590", bg="royalblue")
+TimerFrame = Frame(TabControl, width="590", height="590", bg="#d4ccc3")
 TimerFrame.pack(fill="both", expand=1)
 
 
-# Add Stopwatch Frame to Tab Control
+# Timer Label 
+TimerLabel = Label(TimerFrame, text="Timer", font=("Arial", 50), bg="#d4ccc3")
+TimerLabel.pack()
+
+
+# Timer Setup Frame - A Frame to Place All Widgets to Set Up Timer
+TimerSetupFrame = Frame(TimerFrame, width=500, height=500, bg="#d4ccc3")
+TimerSetupFrame.pack(pady=25)
+
+
+'''Timer: Hours Section'''
+
+
+# Timer Hours Setup Frame - A Frame to Place Label & Entry Boxes to Set Up Hours for Timer
+TimerHoursSetupFrame = Frame(TimerSetupFrame, width=250, height=100, bg="#d4ccc3")
+TimerHoursSetupFrame.grid(row=0, column=0, padx=10)
+
+
+# Timer Hours Label
+Timer_HoursLabel = Label(TimerHoursSetupFrame, text="Hours:", font=("Arial", 20), bg="#d4ccc3")
+Timer_HoursLabel.grid(row=0, column=0)
+
+
+# Timer Hours Entry
+Timer_HoursEntry = Entry(TimerHoursSetupFrame, width=10, font=("Arial", 16))
+Timer_HoursEntry.grid(row=1, column=0)
+
+
+'''Timer: Minutes Section'''
+
+
+# Timer Minutes Setup Frame - A Frame to Place Entry Boxes to Set Up Minutes for Timer
+TimerMinutesSetupFrame = Frame(TimerSetupFrame, width=250, height=100, bg="#d4ccc3")
+TimerMinutesSetupFrame.grid(row=0, column=1, padx=10)
+
+
+# Timer Minutes Label
+Time_MinutesLabel = Label(TimerMinutesSetupFrame, text="Minutes:", font=("Arial", 20), bg="#d4ccc3")
+Time_MinutesLabel.grid(row=0, column=1)
+
+
+# Timer Minutes Entry
+Timer_MinutesEntry = Entry(TimerMinutesSetupFrame, width=10, font=("Arial", 16))
+Timer_MinutesEntry.grid(row=1, column=1)
+
+
+'''Timer: Seconds Section'''
+
+
+# Timer Seconds Setup Frame - A Frame to Place Entry Boxes to Set Up Seconds for Timer
+TimerSecondsSetupFrame = Frame(TimerSetupFrame, width=250, height=100, bg="#d4ccc3")
+TimerSecondsSetupFrame.grid(row=0, column=2, padx=10)
+
+
+# Timer Seconds Label
+Time_SecondsLabel = Label(TimerSecondsSetupFrame, text="Seconds:", font=("Arial", 20), bg="#d4ccc3")
+Time_SecondsLabel.grid(row=0, column=1)
+
+
+# Timer Seconds Entry
+Timer_SecondsEntry = Entry(TimerSecondsSetupFrame, width=10, font=("Arial", 16))
+Timer_SecondsEntry.grid(row=1, column=1)
+
+
+'''Timer: Buttons Frame'''
+
+
+# Timer Buttons Frame - A Frame to Place All Buttons for Timer
+TimerBtnsFrame = Frame(TimerFrame, width=450, height=325, bg="#d4ccc3")
+TimerBtnsFrame.pack(pady=2)
+
+
+# Start Timer Button
+StartTimerBtn = Button(TimerBtnsFrame, text="Start", width=16, font=("Arial", 25), bg="#16c93a", bd=1, command=None)
+StartTimerBtn.pack(pady=5)
+
+
+# Stop Timer Button
+StopTimerBtn = Button(TimerBtnsFrame, text="Stop", width=16, font=("Arial", 25), background="#e63030", bd=1, command=None)
+StopTimerBtn.pack(pady=5)
+
+
+# Reset Timer Button
+ResetTimerBtn = Button(TimerBtnsFrame, text="Reset", width=16, font=("Arial", 25), background="lightgray", bd=1, command=None)
+ResetTimerBtn.pack(pady=5)
+
+
+# Add Timer Frame to Tab Control
 TabControl.add(TimerFrame, text="Timer")
 
 
@@ -630,6 +717,8 @@ TabControl.add(TimerFrame, text="Timer")
 '''
 MenuBar for Program
 '''
+
+
 
 # Menubar - Place for Placing Menu Options
 MenuBar = Menu(root)
