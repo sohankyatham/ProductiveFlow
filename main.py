@@ -4,11 +4,13 @@
 
 
 # Imports
+from re import L
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 import tkinter.font as tkfont
+import pickle
 import webbrowser
 
 
@@ -76,7 +78,7 @@ root.bind('<Control-Key-n>', NewFileFunc)
 # FileMenu: Open File Function
 def OpenFileFunc(*args):
     # Open File Dialog Asking User Which File They Want to Open
-    FilePath = filedialog.askopenfilename(initialdir="C:/gui/", title="Open a File", filetypes=(("All Files", "*.*"), ("Text Files", "*.txt"), ("HTML Files", "*.html"), ("CSS Files", "*.css"),("JavaScript Files", "*.js"), ("Python Files", "*.py"), ("All Files", "*.*")))
+    FilePath = filedialog.askopenfilename(title="Open a File", filetypes=(("All Files", "*.*"), ("Text Files", "*.txt"), ("HTML Files", "*.html"), ("CSS Files", "*.css"),("JavaScript Files", "*.js"), ("Python Files", "*.py"), ("All Files", "*.*")))
     print(FilePath)
     
     # FilePath is the name of the file and has details corresponding to the file
@@ -113,7 +115,7 @@ root.bind('<Control-Key-s>', SaveFileFunc)
 
 # FileMenu: Save As Function
 def SaveAsFunc(*args):
-    FilePath = filedialog.asksaveasfilename(defaultextension=".*", initialdir="C:/gui/", title="Save File As", filetypes=(("All Files", "*.*"), ("Text Files", "*.txt"), ("HTML Files", "*.html"), ("CSS Files", "*.css"), ("JavaScript Files", "*.js"), ("Python Files", "*.py")))
+    FilePath = filedialog.asksaveasfilename(defaultextension=".*", title="Save File As", filetypes=(("All Files", "*.*"), ("Text Files", "*.txt"), ("HTML Files", "*.html"), ("CSS Files", "*.css"), ("JavaScript Files", "*.js"), ("Python Files", "*.py")))
     if FilePath:
         # Save the File
         FilePath = open(FilePath, "w")
@@ -329,10 +331,33 @@ def DeleteTaskFunc():
 def SaveTasksFunc():
     UserFile_ToDoList = filedialog.asksaveasfilename(title="Save To-Do List As File", filetypes=(("Dat Files", "*.dat"), ("All Files", "*.*")))
 
+    if UserFile_ToDoList:
+        if UserFile_ToDoList.endswith(".dat"):
+            pass
+        else:
+            UserFile_ToDoList = f'{UserFile_ToDoList}.dat'
+
+    # Get the Tasks from the ListBox and Open the File and Write/Save the Tasks
+    ToDoList_Tasks = ListBoxForTDList.get(0, END)
+    ToDoList_TasksForSaving = open(UserFile_ToDoList, "wb")
+    pickle.dump(ToDoList_Tasks, ToDoList_TasksForSaving)
+
+
 
 # To-Do List: Load Tasks Function
 def LoadTasksFunc():
-    pass
+    UserFile_ToDoList = filedialog.askopenfilename(title="Open A To-Do List As A File", filetypes=(("Dat Files", "*.dat"), ("All Files", "*.*")))
+
+    # Open the File and Insert it Into ListBoxForTDList
+    if UserFile_ToDoList:
+        # Delete Everything in the To-Do List
+        ListBoxForTDList.delete(0, END)
+        # Open To-Do List File
+        Open_ToDoListFile = open(UserFile_ToDoList, "rb")
+        # Insert To-Do List into ListBoxForTDList
+        ToDoList_Tasks = pickle.load(Open_ToDoListFile)
+        for ToDoList_Task in ToDoList_Tasks:
+            ListBoxForTDList.insert(END, ToDoList_Task)
 
 
 
@@ -423,6 +448,28 @@ def UpdateStopwatchFunc():
 
 
 
+'''
+Functions for Timer
+'''
+
+
+
+# Timer: Start Timer Function
+def StartTimerFunc():
+    print("Started timer")
+
+
+# Timer: Stop Timer Function
+def StopTimerFunc():
+    print("Stoped Timer")
+
+
+# Timer: Reset Timer Function
+def ResetTimerFunc():
+    print("Reset Timer")
+
+
+
 # Tab Control - Place to Hold Tabs (Calendar Tab, To-Do List Tab, Notes Tab, Stopwatch Tab, and Timer Tab)
 TabControl = ttk.Notebook(root)
 TabControl.pack()
@@ -480,22 +527,22 @@ EnterTaskEntry.pack(pady=10)
 
 
 # AddTaskButton - Displays a Button called "Add Task" Which Adds a Task into a list of Tasks 
-AddTaskButton = Button(ManageTaskFrame, text="Add Task", font=("Arial", 12), command=AddTaskFunc)
+AddTaskButton = Button(ManageTaskFrame, text="Add Task", width=10, font=("Arial", 14), bg="#15e650", command=AddTaskFunc)
 AddTaskButton.pack(pady=5)
 
 
 # DeleteTaskBtn - Displays a Button called "Delete Task" Which Deletes a Task in the ListBoxForTDList
-DeleteTaskBtn = Button(ManageTaskFrame, text="Delete Task", font=("Arial", 12), command=DeleteTaskFunc)
+DeleteTaskBtn = Button(ManageTaskFrame, text="Delete Task", width=10, font=("Arial", 14), bg="#e63030", command=DeleteTaskFunc)
 DeleteTaskBtn.pack()
 
 
 # SaveTasksBtn - Displays a Button called "Save Tasks" Which Saves the Tasks to a File Which can be opened later
-SaveTasksBtn = Button(ManageTaskFrame, text="Save Tasks", font=("Arial", 12), command=SaveTasksFunc)
-SaveTasksBtn.pack()
+SaveTasksBtn = Button(ManageTaskFrame, text="Save Tasks", width=10, bg="#9b34eb", font=("Arial", 14), command=SaveTasksFunc)
+SaveTasksBtn.pack(pady=5)
 
 
 # LoadTasksBtn - Displays a Button called "Load Tasks" Which Loads the Tasks into the ListBoxForTDList
-LoadTasksBtn = Button(ManageTaskFrame, text="Load Tasks", font=("Arial", 12), command=LoadTasksFunc)
+LoadTasksBtn = Button(ManageTaskFrame, text="Load Tasks", width=10, bg="#1E90FF", font=("Arial", 14), command=LoadTasksFunc)
 LoadTasksBtn.pack()
 
 
@@ -695,17 +742,17 @@ TimerBtnsFrame.pack(pady=2)
 
 
 # Start Timer Button
-StartTimerBtn = Button(TimerBtnsFrame, text="Start", width=16, font=("Arial", 25), bg="#16c93a", bd=1, command=None)
+StartTimerBtn = Button(TimerBtnsFrame, text="Start", width=16, font=("Arial", 25), bg="#16c93a", bd=1, command=StartTimerFunc)
 StartTimerBtn.pack(pady=5)
 
 
 # Stop Timer Button
-StopTimerBtn = Button(TimerBtnsFrame, text="Stop", width=16, font=("Arial", 25), background="#e63030", bd=1, command=None)
+StopTimerBtn = Button(TimerBtnsFrame, text="Stop", width=16, font=("Arial", 25), background="#e63030", bd=1, command=StopTimerFunc)
 StopTimerBtn.pack(pady=5)
 
 
 # Reset Timer Button
-ResetTimerBtn = Button(TimerBtnsFrame, text="Reset", width=16, font=("Arial", 25), background="lightgray", bd=1, command=None)
+ResetTimerBtn = Button(TimerBtnsFrame, text="Reset", width=16, font=("Arial", 25), background="lightgray", bd=1, command=ResetTimerFunc)
 ResetTimerBtn.pack(pady=5)
 
 
