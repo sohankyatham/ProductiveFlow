@@ -4,13 +4,14 @@
 
 
 # Imports
-from re import L
 from tkinter import *
 from tkinter import ttk
+import calendar
 from tkinter import filedialog
 from tkinter import messagebox
 import tkinter.font as tkfont
 import pickle
+import time
 import webbrowser
 
 
@@ -40,28 +41,57 @@ root.resizable(False, False)
 
 
 
-# Global OpenFileName - used for finding name/status of opened file and using it later in code for functions such as saving a file and etc
+# Notes: Global OpenFileName - used for finding name/status of opened file and using it later in code for functions such as saving a file and etc
 OpenFileName = False
 
 
-# Global SelectedText - used for storing any selected text and then pasting that text into the TextBoxForNotes
+# Notes: Global SelectedText - used for storing any selected text and then pasting that text into the TextBoxForNotes
 SelectedText = False
 
 
-# Global StopwatchRunningStatus - used for checking if the Stopwatch is running or not
+# Stopwatch: Global StopwatchRunningStatus - used for checking if the Stopwatch is running or not
 StopwatchRunningStatus = False
 
 
-# Global Hours, Minutes, and Seconds - used for
+# Stopwatch: Global Hours, Minutes, and Seconds - used for Reseting Time on Stopwatch
 Stopwatch_Hours = 0
 Stopwatch_Minutes = 0
 Stopwatch_Seconds = 0
+
+
+# Timer: Global TimerRunningStatus - used for checking if the Timer is running or not
+TimerRunningStatus = False
+
+
+# Timer: Global Hours, Minutes, and Seconds
+Timer_Hours = StringVar()
+Timer_Minutes = StringVar()
+Timer_Seconds = StringVar()
+
+Timer_Hours.set("00")
+Timer_Minutes.set("00")
+Timer_Seconds.set("00")
 
 
 
 '''
 Functions for MenuBar Options
 '''
+
+
+
+# Calendar: Show Calendar Function
+def ShowCalendarFunc():
+    CalendarMonth = int(MonthSpinbox.get())
+    CalendarYear = int(YearSpinbox.get())
+    CalendarOutput = calendar.month(CalendarYear, CalendarMonth)
+
+    CalendarDisplay.insert('end', CalendarOutput)
+
+
+# Calendar: Clear Calendar Function
+def ClearCalendarFunc():
+    pass
 
 
 
@@ -456,17 +486,56 @@ Functions for Timer
 
 # Timer: Start Timer Function
 def StartTimerFunc():
-    print("Started timer")
+    global TimerRunningStatus
+
+    TimerRunningStatus = True
+
+    try:
+        Timer_UserInput = int(Timer_Hours.get())*3600 + int(Timer_Minutes.get())*60 + int(Timer_Seconds.get())
+    except:
+        messagebox.showwarning('', 'Invalid Input!')
+    while Timer_UserInput >-1 and TimerRunningStatus:
+        mins,secs = divmod(Timer_UserInput,60) 
+
+        hours=0
+        if mins >60:
+            hours, mins = divmod(mins, 60)
+	
+        Timer_Hours.set("{0:2d}".format(hours))
+        Timer_Minutes.set("{0:2d}".format(mins))
+        Timer_Seconds.set("{0:2d}".format(secs))
+
+	
+        root.update()
+        time.sleep(1)
+
+	
+        if (Timer_UserInput == 0):
+            messagebox.showinfo("", "Time's Up")
+		
+
+        Timer_UserInput -= 1
+
 
 
 # Timer: Stop Timer Function
 def StopTimerFunc():
-    print("Stoped Timer")
+    global TimerRunningStatus
+    TimerRunningStatus = False
 
 
 # Timer: Reset Timer Function
 def ResetTimerFunc():
-    print("Reset Timer")
+    global TimerRunningStatus
+    global Timer
+    TimerRunningStatus = False
+
+    Timer_Hours.set("00")
+    Timer_Minutes.set("00")
+    Timer_Seconds.set("00")
+
+
+# Timer: Update Timer Function
 
 
 
@@ -482,9 +551,72 @@ Calendar Section
 ******************************************************************
 """
 
+
 # Calendar Frame - A Frame to Place Calendar Program
-CalendarFrame = Frame(TabControl, width="590", height="590", bg="#606060")
+CalendarFrame = Frame(TabControl, width="590", height="590", bg="#f5db6f")
 CalendarFrame.pack(fill="both", expand=1)
+
+
+# Calendar Setup Frame - A Frame to Place All Widgets to Set Up Calendar
+CalendarSetupFrame = Frame(CalendarFrame, width=590, height=100, bg="#f5db6f")
+CalendarSetupFrame.pack(pady=25)
+
+
+'''Calendar: Months Section'''
+
+
+# Month Label 
+MonthLabel = Label(CalendarSetupFrame, text="Month: ", font=('Arial', 20), bg="#f5db6f")
+MonthLabel.grid(row=0, column=0)
+
+
+# Month Spinbox
+MonthSpinbox = Spinbox(CalendarSetupFrame, from_=1, to=12, width=5, font=("Arial", 20))
+MonthSpinbox.grid(row=0, column=1)
+
+
+'''Calendar: Year Section'''
+
+
+# Empty Frame
+EmptyFrame = Frame(CalendarSetupFrame, width=36, bg="#f5db6f")
+EmptyFrame.grid(row=0, column=2)
+
+
+# Year Label 
+YearLabel = Label(CalendarSetupFrame, text="Year: ", font=('Arial', 20), bg="#f5db6f")
+YearLabel.grid(row=0, column=3)
+
+
+# Year Spinbox
+YearSpinbox = Spinbox(CalendarSetupFrame, from_=2022, to=3000, width=5, font=("Arial", 20))
+YearSpinbox.grid(row=0, column=4)
+
+
+'''Calendar: Calendar Display'''
+
+
+# Calendar Display Text Widget
+CalendarDisplay = Text(CalendarFrame, width=33, height=8, relief=RIDGE, borderwidth=2, font=("Courier", 16))
+CalendarDisplay.pack()
+
+
+'''Calendar: Buttons Section'''
+
+
+# Calendar Buttons Frame - A Frame in CalendarFrame to Place Buttons
+CalendarBtnsFrame = Frame(CalendarFrame, width=450, height=450, bg="#f5db6f")
+CalendarBtnsFrame.pack(pady=30)
+
+
+# Show Calendar Button
+ShowCalendarBtn = Button(CalendarBtnsFrame, text="Show", width=10, font=("Arial", 16), bg="#15e650", bd=1, command=ShowCalendarFunc)
+ShowCalendarBtn.pack(pady=5)
+
+
+# Clear Calendar Button
+ClearCalendarBtn = Button(CalendarBtnsFrame, text="Clear", width=10, font=("Arial", 16), bg="#e63030", bd=1, command=ClearCalendarFunc)
+ClearCalendarBtn.pack(pady=5)
 
 
 # Add Calendar Frame to Tab Control
@@ -499,7 +631,7 @@ To-Do List Section
 
 
 # To-Do List Frame - A Frame to Place To-do List Program
-ToDoListFrame = Frame(TabControl, width="590", height="590", bg="lightgray")
+ToDoListFrame = Frame(TabControl, width="550", height="550", bg="lightgray")
 ToDoListFrame.pack(fill="both", expand=1)
 
 
@@ -669,11 +801,6 @@ TimerFrame = Frame(TabControl, width="590", height="590", bg="#d4ccc3")
 TimerFrame.pack(fill="both", expand=1)
 
 
-# Timer Label 
-TimerLabel = Label(TimerFrame, text="00:00:00", font=("Arial", 50), bg="#d4ccc3")
-TimerLabel.pack()
-
-
 # Timer Setup Frame - A Frame to Place All Widgets to Set Up Timer
 TimerSetupFrame = Frame(TimerFrame, width=500, height=500, bg="#d4ccc3")
 TimerSetupFrame.pack(pady=25)
@@ -688,12 +815,12 @@ TimerHoursSetupFrame.grid(row=0, column=0, padx=10)
 
 
 # Timer Hours Label
-Timer_HoursLabel = Label(TimerHoursSetupFrame, text="Hours:", font=("Arial", 20), bg="#d4ccc3")
+Timer_HoursLabel = Label(TimerHoursSetupFrame, text="Hours:", font=("Arial", 33), bg="#d4ccc3")
 Timer_HoursLabel.grid(row=0, column=0)
 
 
 # Timer Hours Entry
-Timer_HoursEntry = Entry(TimerHoursSetupFrame, width=10, font=("Arial", 16))
+Timer_HoursEntry = Entry(TimerHoursSetupFrame, width=10, font=("Arial", 23), textvariable=Timer_Hours)
 Timer_HoursEntry.grid(row=1, column=0)
 
 
@@ -706,12 +833,12 @@ TimerMinutesSetupFrame.grid(row=0, column=1, padx=10)
 
 
 # Timer Minutes Label
-Time_MinutesLabel = Label(TimerMinutesSetupFrame, text="Minutes:", font=("Arial", 20), bg="#d4ccc3")
+Time_MinutesLabel = Label(TimerMinutesSetupFrame, text="Minutes:", font=("Arial", 33), bg="#d4ccc3")
 Time_MinutesLabel.grid(row=0, column=1)
 
 
 # Timer Minutes Entry
-Timer_MinutesEntry = Entry(TimerMinutesSetupFrame, width=10, font=("Arial", 16))
+Timer_MinutesEntry = Entry(TimerMinutesSetupFrame, width=10, font=("Arial", 23), textvariable=Timer_Minutes)
 Timer_MinutesEntry.grid(row=1, column=1)
 
 
@@ -724,12 +851,12 @@ TimerSecondsSetupFrame.grid(row=0, column=2, padx=10)
 
 
 # Timer Seconds Label
-Time_SecondsLabel = Label(TimerSecondsSetupFrame, text="Seconds:", font=("Arial", 20), bg="#d4ccc3")
+Time_SecondsLabel = Label(TimerSecondsSetupFrame, text="Seconds:", font=("Arial", 33), bg="#d4ccc3")
 Time_SecondsLabel.grid(row=0, column=1)
 
 
 # Timer Seconds Entry
-Timer_SecondsEntry = Entry(TimerSecondsSetupFrame, width=10, font=("Arial", 16))
+Timer_SecondsEntry = Entry(TimerSecondsSetupFrame, width=10, font=("Arial", 23), textvariable=Timer_Seconds)
 Timer_SecondsEntry.grid(row=1, column=1)
 
 
@@ -738,21 +865,21 @@ Timer_SecondsEntry.grid(row=1, column=1)
 
 # Timer Buttons Frame - A Frame to Place All Buttons for Timer
 TimerBtnsFrame = Frame(TimerFrame, width=450, height=325, bg="#d4ccc3")
-TimerBtnsFrame.pack(pady=2)
+TimerBtnsFrame.pack(pady=40)
 
 
 # Start Timer Button
-StartTimerBtn = Button(TimerBtnsFrame, text="Start", width=16, font=("Arial", 25), bg="#16c93a", bd=1, command=StartTimerFunc)
+StartTimerBtn = Button(TimerBtnsFrame, text="Start", width=14, font=("Arial", 25), bg="#16c93a", bd=1, command=StartTimerFunc)
 StartTimerBtn.pack(pady=5)
 
 
 # Stop Timer Button
-StopTimerBtn = Button(TimerBtnsFrame, text="Stop", width=16, font=("Arial", 25), background="#e63030", bd=1, command=StopTimerFunc)
+StopTimerBtn = Button(TimerBtnsFrame, text="Stop", width=14, font=("Arial", 25), background="#e63030", bd=1, command=StopTimerFunc)
 StopTimerBtn.pack(pady=5)
 
 
 # Reset Timer Button
-ResetTimerBtn = Button(TimerBtnsFrame, text="Reset", width=16, font=("Arial", 25), background="lightgray", bd=1, command=ResetTimerFunc)
+ResetTimerBtn = Button(TimerBtnsFrame, text="Reset", width=14, font=("Arial", 25), background="lightgray", bd=1, command=ResetTimerFunc)
 ResetTimerBtn.pack(pady=5)
 
 
@@ -832,6 +959,17 @@ StopwatchMenu.add_separator()
 StopwatchMenu.add_command(label="Stop Stopwatch", command=StopStopwatchFunc)
 StopwatchMenu.add_separator()
 StopwatchMenu.add_command(label="Reset Stopwatch", command=ResetStopwatchFunc)
+
+
+# Timer Menu
+TimerMenu = Menu(MenuBar, tearoff=False)
+# Add the Timer Menu to the MenuBar
+MenuBar.add_cascade(label="Timer", menu=TimerMenu)
+TimerMenu.add_command(label="Start Timer", command=StartTimerFunc)
+TimerMenu.add_separator()
+TimerMenu.add_command(label="Stop Timer", command=StopTimerFunc)
+TimerMenu.add_separator()
+TimerMenu.add_command(label="Reset Timer", command=ResetTimerFunc)
 
 
 # Help Menu
