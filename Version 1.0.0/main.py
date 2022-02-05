@@ -288,7 +288,7 @@ root.bind("<Control-Key-a>", SelectAll)
 
 # HelpMenu: Documentation Function 
 def DocumentationFunc(): # In the future create a new tab directly in the ProductivityFlow Application and include the link
-    webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/Documentation.md")
+    webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/Version%201.0.0/Documentation.md")
 
 
 # HelpMenu: Release Notes Function
