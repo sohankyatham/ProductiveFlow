@@ -535,9 +535,6 @@ def ResetTimerFunc():
     Timer_Seconds.set("00")
 
 
-# Timer: Update Timer Function
-
-
 
 # Tab Control - Place to Hold Tabs (Calendar Tab, To-Do List Tab, Notes Tab, Stopwatch Tab, and Timer Tab)
 TabControl = ttk.Notebook(root)
