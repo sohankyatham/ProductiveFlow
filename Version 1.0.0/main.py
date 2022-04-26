@@ -20,11 +20,11 @@ import webbrowser
 root = Tk()
 
 
-# Set up Geometry and Center the Window
+# Set up Window Dimensions and Center the Window
 Window_Width = 600
 Window_Height = 600
 
-# Get Screen Width and Height
+# Get Window Width and Height
 Screen_Width = root.winfo_screenwidth()
 Screen_Height = root.winfo_screenheight()
 
@@ -41,11 +41,11 @@ root.resizable(False, False)
 
 
 
-# Notes: Global OpenFileName - used for finding name/status of opened file and using it later in code for functions such as saving a file and etc
+# CodeEditor: Global OpenFileName - used for finding name/status of opened file and using it later in code for functions such as saving a file and etc
 OpenFileName = False
 
 
-# Notes: Global SelectedText - used for storing any selected text and then pasting that text into the TextBoxForNotes
+# CodeEditor: Global SelectedText - used for storing any selected text and then pasting that text into the CodeEditor_TextBox
 SelectedText = False
 
 
@@ -74,24 +74,48 @@ Timer_Seconds.set("00")
 
 
 
+
+
+####################################
 '''
-Functions for MenuBar Options
+Functions for MenuBar
 '''
+####################################
 
 
 
-# Calendar: Show Calendar Function
-def ShowCalendarFunc():
-    CalendarMonth = int(MonthSpinbox.get())
-    CalendarYear = int(YearSpinbox.get())
-    CalendarOutput = calendar.month(CalendarYear, CalendarMonth)
-
-    CalendarDisplay.insert('end', CalendarOutput)
 
 
-# Calendar: Clear Calendar Function
-def ClearCalendarFunc():
-    pass
+# Find Selected Tab and Change the MenuBar Options Accordingly
+def ChangeMenuForSelctedTab(event):
+    # Find Selected Tab
+    SelectedTab = event.widget.select() 
+    TabTitle = event.widget.tab(SelectedTab, "text")
+
+
+    if TabTitle == "Code Editor":
+        print("Code Editor Tab")
+
+    if TabTitle == "Calendar":
+        print("Calendar Tab")
+        ExampleMenuFunc()
+
+    if TabTitle == "To-Do List":
+        print("To-Do List Tab")
+
+    if TabTitle == "Stopwatch":
+        print("Stopwatch Tab")
+
+    if TabTitle == "Timer":
+        print("Timer Tab")
+
+
+
+
+
+'''
+Functions for CodeEditor: FileMenu Options
+'''
 
 
 
@@ -100,15 +124,14 @@ def NewFileFunc(*args):
     global OpenFileName
 
     OpenFileName = False
-    TextBoxForNotes.delete("1.0", END)  
-
+    CodeEditor_TextBox.delete("1.0", END)  
 root.bind('<Control-Key-n>', NewFileFunc)
 
 
 # FileMenu: Open File Function
 def OpenFileFunc(*args):
     # Open File Dialog Asking User Which File They Want to Open
-    FilePath = filedialog.askopenfilename(title="Open a File", filetypes=(("All Files", "*.*"), ("Text Files", "*.txt"), ("HTML Files", "*.html"), ("CSS Files", "*.css"),("JavaScript Files", "*.js"), ("Python Files", "*.py"), ("All Files", "*.*")))
+    FilePath = filedialog.askopenfilename(title="Open a File", filetypes=(("All Files", "*.*"), ("Text Files", "*.txt"), ("HTML Files", "*.html"), ("CSS Files", "*.css"),("JavaScript Files", "*.js"), ("Python Files", "*.py")))
     print(FilePath)
     
     # FilePath is the name of the file and has details corresponding to the file
@@ -117,13 +140,12 @@ def OpenFileFunc(*args):
     if FilePath:
         global OpenFileName
         OpenFileName = FilePath
-    
 
     # Open File and Insert File Content into Editor
     FilePath = open(FilePath, 'r')
     FileContent = FilePath.read()
-    TextBoxForNotes.delete("1.0", END)
-    TextBoxForNotes.insert(END, FileContent)
+    CodeEditor_TextBox.delete("1.0", END)
+    CodeEditor_TextBox.insert(END, FileContent)
     FilePath.close()
 root.bind('<Control-Key-o>', OpenFileFunc)
 
@@ -135,7 +157,7 @@ def SaveFileFunc(*args):
     # If File has been opened then save
     if OpenFileName:
         FilePath = open(OpenFileName, "w")
-        FilePath.write(TextBoxForNotes.get(1.0, END))
+        FilePath.write(CodeEditor_TextBox.get(1.0, END))
         FilePath.close()
     # If the file does not exist, then save this file as a file
     else:
@@ -145,11 +167,11 @@ root.bind('<Control-Key-s>', SaveFileFunc)
 
 # FileMenu: Save As Function
 def SaveAsFunc(*args):
-    FilePath = filedialog.asksaveasfilename(defaultextension=".*", title="Save File As", filetypes=(("All Files", "*.*"), ("Text Files", "*.txt"), ("HTML Files", "*.html"), ("CSS Files", "*.css"), ("JavaScript Files", "*.js"), ("Python Files", "*.py")))
+    FilePath = filedialog.asksaveasfilename(defaultextension=".*", title="Save File As", filetypes=(("All Files", "*.*"), ("Text Files", "*.txt"), ("HTML Files", "*.html"), ("CSS Files", "*.css"),("JavaScript Files", "*.js"), ("Python Files", "*.py")))
     if FilePath:
         # Save the File
         FilePath = open(FilePath, "w")
-        FilePath.write(TextBoxForNotes.get(1.0, END))
+        FilePath.write(CodeEditor_TextBox.get(1.0, END))
         FilePath.close()
 root.bind('<Control-Shift-S>', SaveAsFunc)
 
@@ -159,7 +181,7 @@ def DeclareAutoSaveFunc():
     global OpenFileName
     # Declare the Auto Save function - write code for what the Auto Save function is supposed to do
     if OpenFileName:
-        FileContentData = TextBoxForNotes.get("1.0", "end-1c")
+        FileContentData = CodeEditor_TextBox.get("1.0", "end-1c")
         with open(OpenFileName, "w") as SaveContent:
             SaveContent.write(FileContentData)
 
@@ -168,7 +190,7 @@ def DeclareAutoSaveFunc():
 def InitAutoSave():
     if AutoSave_CheckMark.get():
         DeclareAutoSaveFunc()
-        TextBoxForNotes.after(100, InitAutoSave)
+        CodeEditor_TextBox.after(100, InitAutoSave)
     else: 
         # Undeclare the Python Function - Turn OFF the AutoSave Feature
         AutoSave_CheckMark.set(False)
@@ -193,15 +215,80 @@ root.bind("<Alt-Key-F4>", ExitFunc)
 
 
 
+'''
+Functions for CodeEditor: EditMenu Options
+'''
+
+
+
+# EditMenu: Cut Text Function
+def CutText(e):
+    global SelectedText
+    # Check to see if keyboard shortcut was used
+    if e:
+        SelectedText = root.clipboard_get()
+    else:
+        # Grab selected text - then copy that text and remove it from CodeEditor_TextBox
+        if CodeEditor_TextBox.selection_get():
+            SelectedText = CodeEditor_TextBox.selection_get()
+            CodeEditor_TextBox.delete("sel.first", "sel.last")
+            # If copy option is used from edit menu and clear clipboard
+            root.clipboard_clear()
+            root.clipboard_append(SelectedText)
+root.bind("<Control-Key-x>", CutText)
+
+
+# EditMenu: Copy Text Function
+def CopyText(e):
+    global SelectedText
+    # Check to see if the keyboard shortcut was used
+    if e:
+        SelectedText = root.clipboard_get()
+    # Check to see if there is selected text - if there is then copy it
+    if CodeEditor_TextBox.selection_get():
+        SelectedText = CodeEditor_TextBox.selection_get()
+        # If copy option is used from edit menu and clear clipboard
+        root.clipboard_clear()
+        root.clipboard_append(SelectedText)
+root.bind("<Control-Key-c>", CopyText)
+
+
+# EditMenu: Paste Text Function
+def PasteText(e):
+    global SelectedText
+    # Check to see if shortcut is used
+    if e:
+        SelectedText = root.clipboard_get()
+    else:
+        # Paste the Selected Text into the Cursor Position
+        if SelectedText:
+            CursorPosition = CodeEditor_TextBox.index(INSERT)
+            CodeEditor_TextBox.insert(CursorPosition, SelectedText)
+root.bind("<Control-Key-v>", PasteText)
+
+
+# EditMenu: Select All Function
+def SelectAll(e):
+    CodeEditor_TextBox.tag_add("sel", 1.0, "end")
+root.bind("<Control-Key-a>", SelectAll)
+
+
+
+'''
+Functions for CodeEditor: ToolsMenu Options
+'''
+
+
+
 # ToolsMenu: Declare Word Count and Character Count Function
 def DeclareWordCount():
-    # Get Content from TextBoxForNotes - Turn String Into a Number: of characters and words
-    TextContent_ForWordCount = TextBoxForNotes.get("1.0", END)
+    # Get Content from CodeEditor_TextBox - Turn String Into a Number: of characters and words
+    TextContent_ForWordCount = CodeEditor_TextBox.get("1.0", END)
     # String to Number 
-    CharactersInTextBoxForNotes = len(TextContent_ForWordCount)    
-    WordsInTextBoxForNotes = len(TextContent_ForWordCount.split())
+    CharactersIn_CodeEditor_TextBox = len(TextContent_ForWordCount)    
+    WordsIn_CodeEditor_TextBox = len(TextContent_ForWordCount.split())
     # Config in Status Bar
-    StatusBar.config(text=str(CharactersInTextBoxForNotes-1) + " Characters, " + str(WordsInTextBoxForNotes) + " Words, ")
+    StatusBar.config(text=str(CharactersIn_CodeEditor_TextBox-1) + " Characters, " + str(WordsIn_CodeEditor_TextBox) + " Words")
 
 
 # ToolsMenu: Initialize Word Count Function
@@ -219,122 +306,57 @@ def InitWordCount():
 def ToggleWordWrap(*args):
 
     # If there is no word wrap then add word wrap
-    if TextBoxForNotes.cget("wrap") == "none":
-        TextBoxForNotes.configure(wrap="word")
+    if CodeEditor_TextBox.cget("wrap") == "none":
+        CodeEditor_TextBox.configure(wrap="word")
         # Turn on Check Mark if the Function is called 
         WordWrap_CheckMark.set(True)
 
     # If there is word wrap then take out word wrap
-    elif TextBoxForNotes.cget("wrap") == "word":
-        TextBoxForNotes.configure(wrap="none")
+    elif CodeEditor_TextBox.cget("wrap") == "word":
+        CodeEditor_TextBox.configure(wrap="none")
         # Turn off Check Mark if the Function is disabled
         WordWrap_CheckMark.set(False)
 root.bind("<Alt-Key-z>", ToggleWordWrap)
 
 
 
-# EditMenu: Cut Text Function
-def CutText(e):
-    global SelectedText
-    # Check to see if keyboard shortcut was used
-    if e:
-        SelectedText = root.clipboard_get()
-    else:
-        # Grab selected text - then copy that text and remove it from TextBoxForNotes
-        if TextBoxForNotes.selection_get():
-            SelectedText = TextBoxForNotes.selection_get()
-            TextBoxForNotes.delete("sel.first", "sel.last")
-            # If copy option is used from edit menu and clear clipboard
-            root.clipboard_clear()
-            root.clipboard_append(SelectedText)
-root.bind("<Control-Key-x>", CutText)
-
-
-# EditMenu: Copy Text Function
-def CopyText(e):
-    global SelectedText
-    # Check to see if the keyboard shortcut was used
-    if e:
-        SelectedText = root.clipboard_get()
-    # Check to see if there is selected text - if there is then copy it
-    if TextBoxForNotes.selection_get():
-        SelectedText = TextBoxForNotes.selection_get()
-        # If copy option is used from edit menu and clear clipboard
-        root.clipboard_clear()
-        root.clipboard_append(SelectedText)
-root.bind("<Control-Key-c>", CopyText)
-
-
-# EditMenu: Paste Text Function
-def PasteText(e):
-    global SelectedText
-    # Check to see if shortcut is used
-    if e:
-        SelectedText = root.clipboard_get()
-    else:
-        # Paste the Selected Text into the Cursor Position
-        if SelectedText:
-            CursorPosition = TextBoxForNotes.index(INSERT)
-            TextBoxForNotes.insert(CursorPosition, SelectedText)
-root.bind("<Control-Key-v>", PasteText)
-
-
-# EditMenu: Select All Function
-def SelectAll(e):
-    TextBoxForNotes.tag_add("sel", 1.0, "end")
-root.bind("<Control-Key-a>", SelectAll)
-
-
-
-# HelpMenu: Documentation Function 
-def DocumentationFunc(): # In the future create a new tab directly in the ProductivityFlow Application and include the link
-    webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/Version%201.0.0/Documentation.md")
-
-
-# HelpMenu: Release Notes Function
-def ReleaseNotesFunc():
-    webbrowser.open("www.google.com")
-
-
-# HelpMenu: About Screen Function
-def AboutScreenFunc():
-    # About Screen Window
-    AboutScreen = Toplevel(root)
-    AboutScreen.title("About")
-    AboutScreen.geometry("300x200")
-    AboutScreen.resizable(0,0)
-
-    # AboutHeader - Displays a Label called "ProductiveFlow"
-    AboutHeader = Label(AboutScreen, text="ProductiveFlow", font=("Arial", 30))
-    AboutHeader.pack(pady=5)
-
-    # AboutHeaderAttribution
-    AboutHeaderAttribtion = Label(AboutScreen, text="By: Sohan Kyatham", width=16, font=("Arial", 12))
-    AboutHeaderAttribtion.pack()
-
-    # AboutVersion
-    AboutVersion = Label(AboutScreen, text="Version: 1.0.0", width=16, font=("Arial", 12))
-    AboutVersion.pack()
-
-    # Operating System Version
-    AboutOSVersion = Label(AboutScreen, text="OS: Windows", width=16, font=("Arial", 12))
-    AboutOSVersion.pack()
-
-    # View README.md File Function
-    def ViewREADMEFunc():
-        webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/README.md")
-
-    # View README.md Button
-    ViewREADME = Button(AboutScreen, text="View README.md file on GitHub", width=26, font=("Arial", 12), bg="#26aceb", command=ViewREADMEFunc)
-    ViewREADME.pack(pady=15)
-
-    # Mainloop for AboutScreen
-    AboutScreen.mainloop()
+###########################################################
+'''
+Functions for OptionsMenu 
+'''
+######
+######
+######
+'''
+Functions for OptionsMenu 
+'''
+###########################################################
 
 
 
 '''
-Functions for To-Do List
+Functions for Calendar And CalendarMenu
+'''
+
+
+
+# Calendar: Show Calendar Function
+def ShowCalendarFunc():
+    CalendarMonth = int(MonthSpinbox.get())
+    CalendarYear = int(YearSpinbox.get())
+    CalendarOutput = calendar.month(CalendarYear, CalendarMonth)
+
+    CalendarDisplay.insert('end', CalendarOutput)
+
+
+# Calendar: Clear Calendar Function
+def ClearCalendarFunc():
+    pass
+
+
+
+'''
+Functions for ToDo list And ToDoListMenu
 '''
 
 
@@ -392,7 +414,7 @@ def LoadTasksFunc():
 
 
 '''
-Functions for Stopwatch
+Functions for Stopwatch And StopwatchMenu
 '''
 
 
@@ -505,14 +527,11 @@ def StartTimerFunc():
         Timer_Minutes.set("{0:2d}".format(mins))
         Timer_Seconds.set("{0:2d}".format(secs))
 
-	
         root.update()
         time.sleep(1)
 
-	
         if (Timer_UserInput == 0):
             messagebox.showinfo("", "Time's Up")
-		
 
         Timer_UserInput -= 1
 
@@ -536,9 +555,113 @@ def ResetTimerFunc():
 
 
 
-# Tab Control - Place to Hold Tabs (Calendar Tab, To-Do List Tab, Notes Tab, Stopwatch Tab, and Timer Tab)
+'''
+Functions for HelpMenu
+'''
+
+
+
+# HelpMenu: Documentation Function 
+def DocumentationFunc(): # In the future create a new tab directly in the ProductivitFlow Application and include the link
+    webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/Version%201.0.0/Documentation.md")
+
+
+# HelpMenu: Release Notes Function
+def ReleaseNotesFunc():
+    webbrowser.open("www.google.com")
+
+
+# HelpMenu: About Screen Function
+def AboutScreenFunc():
+    # About Screen Window
+    AboutScreen = Toplevel(root)
+    AboutScreen.title("About")
+    AboutScreen.geometry("300x200")
+    AboutScreen.resizable(0,0)
+
+    # AboutHeader - Displays a Label called "ProductiveFlow"
+    AboutHeader = Label(AboutScreen, text="ProductiveFlow", font=("Arial", 30))
+    AboutHeader.pack(pady=5)
+
+    # AboutHeaderAttribution
+    AboutHeaderAttribtion = Label(AboutScreen, text="By: Sohan Kyatham", width=16, font=("Arial", 12))
+    AboutHeaderAttribtion.pack()
+
+    # AboutVersion
+    AboutVersion = Label(AboutScreen, text="Version: 1.0.0", width=16, font=("Arial", 12))
+    AboutVersion.pack()
+
+    # Operating System Version
+    AboutOSVersion = Label(AboutScreen, text="OS: Windows", width=16, font=("Arial", 12))
+    AboutOSVersion.pack()
+
+    # View README.md File Function
+    def ViewREADMEFunc():
+        webbrowser.open("https://github.com/sohankyatham/ProductiveFlow/blob/main/README.md")
+
+    # View README.md Button
+    ViewREADME = Button(AboutScreen, text="View README.md file on GitHub", width=26, font=("Arial", 12), bg="#26aceb", command=ViewREADMEFunc)
+    ViewREADME.pack(pady=15)
+
+    # Mainloop for AboutScreen
+    AboutScreen.mainloop()
+
+
+
+# Tab Control - Place to Hold Tabs (Code Editor Tab, Calendar Tab, To-Do List Tab, Stopwatch Tab, Timer Tab, etc)
 TabControl = ttk.Notebook(root)
 TabControl.pack()
+
+TabControl.bind("<<NotebookTabChanged>>", ChangeMenuForSelctedTab)
+
+
+
+"""
+******************************************************************
+CodeEditor Section
+******************************************************************
+"""
+
+
+# CodeEditor Frame - A Frame to Place CodeEditor Program
+CodeEditorFrame = Frame(TabControl, width="590", height="590")
+CodeEditorFrame.pack(fill="both", expand=1)
+
+
+# StatusBar - For Displaying Word and Character Count
+StatusBar = Label(CodeEditorFrame, text="", anchor=W)
+StatusBar.config(bg="Dodgerblue")
+StatusBar.pack(fill=X, side=BOTTOM, ipady=2)
+
+
+# Vertical Scrollbar For CodeEditor
+VerticalScrollbar = Scrollbar(CodeEditorFrame)
+VerticalScrollbar.pack(side=RIGHT, fill=Y)
+
+
+# Horizontal Scrollbar For CodeEditor
+HorizontalScrollbar = Scrollbar(CodeEditorFrame, orient="horizontal")
+HorizontalScrollbar.pack(side=BOTTOM, fill=X)
+
+
+# CodeEditor_TextBox - Place for Writing Code
+CodeEditor_TextBox = Text(CodeEditorFrame, width=500, height=500, font=("Courier", 16), selectbackground="Skyblue", selectforeground="black", undo=True, wrap="none", yscrollcommand=VerticalScrollbar.set, xscrollcommand=HorizontalScrollbar.set)
+CodeEditor_TextBox.pack()
+
+
+# Set Default Tab Size (4 Spaces) for Text Box 
+font = tkfont.Font(font=CodeEditor_TextBox['font'])
+TabSize = font.measure("    ") # 4 Spaces
+CodeEditor_TextBox.config(tabs=TabSize)
+
+
+# Configure the Vertical and Horizontal Scrollbar
+VerticalScrollbar.config(command=CodeEditor_TextBox.yview)
+HorizontalScrollbar.config(command=CodeEditor_TextBox.xview)
+
+
+# Add CodeEditorFrame to Tab Control
+TabControl.add(CodeEditorFrame, text="Code Editor")
 
 
 
@@ -620,6 +743,7 @@ ClearCalendarBtn.pack(pady=5)
 TabControl.add(CalendarFrame, text="Calendar")
 
 
+
 """
 ******************************************************************
 To-Do List Section
@@ -697,59 +821,13 @@ ListBoxForTDList.pack()
 TabControl.add(ToDoListFrame, text="To-Do List")
 
 
-"""
-******************************************************************
-Notes Section
-******************************************************************
-"""
-
-
-# Notes Frame - A Frame to Place Notes Program
-NotesFrame = Frame(TabControl, width="590", height="590")
-NotesFrame.pack(fill="both", expand=1)
-
-
-# StatusBar - For Displaying Word and Character Count
-StatusBar = Label(NotesFrame, text="", anchor=W)
-StatusBar.config(bg="Dodgerblue")
-StatusBar.pack(fill=X, side=BOTTOM, ipady=2)
-
-
-# Vertical Scrollbar For Notes
-VerticalScrollbar = Scrollbar(NotesFrame)
-VerticalScrollbar.pack(side=RIGHT, fill=Y)
-
-
-# Horizontal Scrollbar For Notes
-HorizontalScrollbar = Scrollbar(NotesFrame, orient="horizontal")
-HorizontalScrollbar.pack(side=BOTTOM, fill=X)
-
-
-# TextBoxForNotes - Place for Writing Notes/Text
-TextBoxForNotes = Text(NotesFrame, width=500, height=500, font=("DejaVu Sans Mono", 16), selectbackground="Skyblue", selectforeground="black", undo=True, wrap="none", yscrollcommand=VerticalScrollbar.set, xscrollcommand=HorizontalScrollbar.set)
-TextBoxForNotes.pack()
-
-
-# Set Default Tab Size (4 Spaces) for Text Box 
-font = tkfont.Font(font=TextBoxForNotes['font'])
-TabSize = font.measure("    ") # 4 Spaces
-TextBoxForNotes.config(tabs=TabSize)
-
-
-# Configure the Vertical and Horizontal Scrollbar
-VerticalScrollbar.config(command=TextBoxForNotes.yview)
-HorizontalScrollbar.config(command=TextBoxForNotes.xview)
-
-
-# Add Notes Frame to Tab Control
-TabControl.add(NotesFrame, text="Notes")
-
 
 """
 ******************************************************************
 Stopwatch Section
 ******************************************************************
 """
+
 
 
 # Stopwatch Frame - A Frame to Place Stopwatch
@@ -786,11 +864,13 @@ ResetStopwatchBtn.pack(pady=5)
 TabControl.add(StopwatchFrame, text="Stopwatch")
 
 
+
 """
 ******************************************************************
 Timer Section
 ******************************************************************
 """
+
 
 
 # Timer Frame - A Frame to Place Timer
@@ -902,12 +982,31 @@ AutoSave_CheckMark = BooleanVar()
 AutoSave_CheckMark.set(False)
 
 
-# File Menu Option
+# File Menu 
 FileMenu = Menu(MenuBar, tearoff=False)
 # Add the File Menu to the MenuBar
 MenuBar.add_cascade(label="File", menu=FileMenu)
+
 FileMenu.add_command(label="New File", accelerator="Ctrl+N", command=NewFileFunc)
+
+# New File (From Template) Dropdown Menu - Lets the User Create a New File From a Boilerplate Template
+NewFromTemplate = Menu(FileMenu, tearoff=False)
+NewFromTemplate.add_command(label="file.html", command=None)
+# Cascade the New File Dropdown Menu to the File Menu
+FileMenu.add_cascade(label="New (from template)", menu=NewFromTemplate)
+
+FileMenu.add_separator()
 FileMenu.add_command(label="Open File", accelerator="Ctrl+O", command=OpenFileFunc)
+
+# Open Recent Dropdown Menu - Opens Recent Files 
+OpenRecentMenu = Menu(FileMenu, tearoff=False)
+OpenRecentMenu.add_command(label="File 1")#,command=OpenRecentFileFunc)
+OpenRecentMenu.add_command(label="File 2")
+OpenRecentMenu.add_command(label="File 3")
+OpenRecentMenu.add_command(label="File 4")
+# Cascade the Open Recent Dropdown Menu to the File Menu
+FileMenu.add_cascade(label="Open Recent", menu=OpenRecentMenu)
+
 FileMenu.add_separator()
 FileMenu.add_command(label="Save File", accelerator="Ctrl+S", command=SaveFileFunc)
 FileMenu.add_command(label="Save As", accelerator="Ctrl+Shift S", command=SaveAsFunc)
@@ -916,12 +1015,13 @@ FileMenu.add_checkbutton(label="Auto Save", onvalue=1, offvalue=0, variable=Auto
 FileMenu.add_command(label="Exit Window", accelerator="Alt-F4", command=ExitFunc)
 
 
-# Edit Menu Option
+
+# Edit Menu 
 EditMenu = Menu(MenuBar, tearoff=False)
 # Add the Edit Menu to the MenuBar
 MenuBar.add_cascade(label="Edit", menu=EditMenu)
-EditMenu.add_command(label="Undo", accelerator="Ctrl+Z", command=TextBoxForNotes.edit_undo)
-EditMenu.add_command(label="Redo", accelerator="Ctrl+Y", command=TextBoxForNotes.edit_redo)
+EditMenu.add_command(label="Undo", accelerator="Ctrl+Z", command=CodeEditor_TextBox.edit_undo)
+EditMenu.add_command(label="Redo", accelerator="Ctrl+Y", command=CodeEditor_TextBox.edit_redo)
 EditMenu.add_separator()
 EditMenu.add_command(label="Cut", accelerator="Ctrl+X", command=lambda: CutText(False))
 EditMenu.add_command(label="Copy", accelerator="Ctrl+C", command=lambda: CopyText(False))
@@ -939,15 +1039,30 @@ WordWrap_CheckMark = BooleanVar()
 WordWrap_CheckMark.set(False)
 
 
-# Tools Menu Option
+# Tools Menu 
 ToolsMenu = Menu(MenuBar, tearoff=False)
 # Add the Tools Menu to the MenuBar
 MenuBar.add_cascade(label="Tools", menu=ToolsMenu)
 ToolsMenu.add_checkbutton(label="Word Count", onvalue=1, offvalue=0, variable=WordCount_CheckMark, command=InitWordCount)
-ToolsMenu.add_checkbutton(label="Toggle Word Wrap", accelerator="Alt+Z", onvalue=1, offvalue=0, variable=WordWrap_CheckMark, command=ToggleWordWrap)
+ToolsMenu.add_checkbutton(label="Toggle Word Wrap", onvalue=1, offvalue=0, variable=WordWrap_CheckMark, accelerator="Alt+Z", command=ToggleWordWrap)
 
 
-# Stopwatch Menu
+
+# Check Marks for Options in ToolsMenu
+NotesMode_CheckMark = BooleanVar()
+NotesMode_CheckMark.set(False)
+
+
+# Options Menu
+OptionsMenu = Menu(MenuBar, tearoff=False)
+# Add the Options Menu to the MenuBar
+MenuBar.add_cascade(label="Options", menu=OptionsMenu)
+OptionsMenu.add_checkbutton(label="Notes Mode", onvalue=1, offvalue=0, variable=NotesMode_CheckMark, command=None)
+OptionsMenu.add_command(label="Settings", command=None)
+
+
+
+# Stopwatch Menu 
 StopwatchMenu = Menu(MenuBar, tearoff=False)
 # Add the Stopwatch Menu to the MenuBar
 MenuBar.add_cascade(label="Stopwatch", menu=StopwatchMenu)
@@ -956,6 +1071,7 @@ StopwatchMenu.add_separator()
 StopwatchMenu.add_command(label="Stop Stopwatch", command=StopStopwatchFunc)
 StopwatchMenu.add_separator()
 StopwatchMenu.add_command(label="Reset Stopwatch", command=ResetStopwatchFunc)
+
 
 
 # Timer Menu
@@ -967,6 +1083,7 @@ TimerMenu.add_separator()
 TimerMenu.add_command(label="Stop Timer", command=StopTimerFunc)
 TimerMenu.add_separator()
 TimerMenu.add_command(label="Reset Timer", command=ResetTimerFunc)
+
 
 
 # Help Menu
@@ -982,7 +1099,6 @@ HelpMenu.add_command(label="About", command=AboutScreenFunc)
 
 # Word And Character Count
 InitWordCount()
-
 
 # Initialize Screen
 root.mainloop()
