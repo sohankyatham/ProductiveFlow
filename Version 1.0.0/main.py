@@ -5,6 +5,7 @@
 
 # Imports
 from tkinter import *
+from FileTemplates import *
 from tkinter import ttk
 import calendar
 from tkinter import filedialog
@@ -98,7 +99,6 @@ def ChangeMenuForSelctedTab(event):
 
     if TabTitle == "Calendar":
         print("Calendar Tab")
-        ExampleMenuFunc()
 
     if TabTitle == "To-Do List":
         print("To-Do List Tab")
@@ -126,6 +126,42 @@ def NewFileFunc(*args):
     OpenFileName = False
     CodeEditor_TextBox.delete("1.0", END)  
 root.bind('<Control-Key-n>', NewFileFunc)
+
+
+
+# FileMenu: New File From Template Functions
+
+# HTMl File Template Function
+def NewHTMLFileFromTemplate():
+    global OpenFileName
+    OpenFileName = False
+    # Delete Previous Content and Insert HTML Template in TextBox
+    CodeEditor_TextBox.delete("1.0", END)
+    CodeEditor_TextBox.insert("1.0", HTML_FileTemplateCode.strip())
+
+# PHP File Template Function
+def NewPHPFileFromTemplate():
+    global OpenFileName
+    OpenFileName = False
+    # Delete Previous Content and Insert PHP Template in TextBox
+    CodeEditor_TextBox.delete("1.0", END)
+    CodeEditor_TextBox.insert("1.0", PHP_FileTemplateCode.strip())
+
+# Python File Template Function
+def NewPythonFileFromTemplate():
+    global OpenFileName
+    OpenFileName = False
+    # Delete Previous Content and Insert Python Template in TextBox
+    CodeEditor_TextBox.delete("1.0", END)
+    CodeEditor_TextBox.insert("1.0", Python_FileTemplateCode.strip())
+
+# Java File Template Function
+def NewJavaFileFromTemplate():
+    global OpenFileName
+    OpenFileName = False
+    # Delete Previous Content and Insert Java Template in TextBox
+    CodeEditor_TextBox.delete("1.0", END)
+    CodeEditor_TextBox.insert("1.0", Java_FileTemplateCode.strip())
 
 
 # FileMenu: Open File Function
@@ -991,7 +1027,10 @@ FileMenu.add_command(label="New File", accelerator="Ctrl+N", command=NewFileFunc
 
 # New File (From Template) Dropdown Menu - Lets the User Create a New File From a Boilerplate Template
 NewFromTemplate = Menu(FileMenu, tearoff=False)
-NewFromTemplate.add_command(label="file.html", command=None)
+NewFromTemplate.add_command(label="file.html", command=NewHTMLFileFromTemplate)
+NewFromTemplate.add_command(label="file.php", command=NewPHPFileFromTemplate)
+NewFromTemplate.add_command(label="file.py", command=NewPythonFileFromTemplate)
+NewFromTemplate.add_command(label="file.java", command=NewJavaFileFromTemplate)
 # Cascade the New File Dropdown Menu to the File Menu
 FileMenu.add_cascade(label="New (from template)", menu=NewFromTemplate)
 
